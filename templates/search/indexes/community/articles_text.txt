@@ -1,0 +1,3 @@
+{{ object.name }}
+{{ object.body }}
+{{ object.content_type }}

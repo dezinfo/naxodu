@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load threadedcomments_tags %}
+
+{% block javascript %}
+    <script type="text/javascript">
+
+        function show_reply_form(event) {
+            var $this = $(this);
+            var comment_id = $this.data('comment-id');
+
+            $('#id_parent').val(comment_id);
+            $('#form-comment').insertAfter($this.closest('.comment'));
+        };
+
+        function cancel_reply_form(event) {
+            $('#id_comment').val('');
+            $('#id_parent').val('');
+            $('#form-comment').appendTo($('#wrap_write_comment'));
+        }
+
+        $.fn.ready(function() {
+            $('.comment_reply_link').click(show_reply_form);
+            $('#cancel_reply').click(cancel_reply_form);
+        })
+
+    </script>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+<div class="article-header">
+    {% get_comment_list for article as comment_list %}
+
+    <p> {{ article.forum }}</p>
+
+    <p>{{ article.name }}</p>
+
+
+    {{ article.media }}
+    {{ article.body|safe }}
+
+</div>
+
+ <div class="views"> Views {{ article.views }}</div>
+ <div class="views"> Autor {{ article.username }}</div>
+</div>
+
+    <div class="comments_wrapper" id="comments">
+        {% render_comment_list for article %}
+
+
+        {% if username %}
+        <div id="wrap_write_comment">
+            {% render_comment_form for article %}
+        </div>
+        {% endif %}
+
+
+
+    </div>
+
+{% endblock %}

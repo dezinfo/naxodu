@@ -19,13 +19,26 @@ from django.utils import duration
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 from django.conf import settings
-from avtocry.views import *
+
+
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^secret/', include(admin.site.urls)),
+    url(r'^admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^$', 'avtocry.views.index'),
-    url(r'^dashboard/', include('advdesk.urls')),
+    url(r'^callboard/', include('callboard.urls')),
+    url(r'^community/', include('community.urls')),
+    url(r'^catalog/', include('catalog.urls')),
+    url(r'^reviews/', include('reviews.urls')),
+    url(r'^shop/', include('shop.urls')),
+    url(r'^userprofile/', include('userprofile.urls')),
+    url(r'^accounts/', include('allauth.urls')),
+    url(r'^comments/', include('django_comments.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+    url(r'^search/', include('haystack.urls')),
+    url(r'^autocomplete/', 'callboard.views.autocomplete', name='autocomplete'),
+    url(r'^tinymce/', include('tinymce.urls')),
 
 
 ]

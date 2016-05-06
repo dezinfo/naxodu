@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container starter-template" xmlns="http://www.w3.org/1999/html">
+
+    <div class="row">
+        <div class="col-md-8">
+
+            <div>
+
+              <!-- Nav tabs -->
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#market" aria-controls="market" role="tab" data-toggle="tab">Моя витрина</a></li>
+                <li role="presentation"><a href="#orders" aria-controls="orders" role="tab" data-toggle="tab">Мои заказы</a></li>
+                <li role="presentation"><a href="#orders_" aria-controls="orders_" role="tab" data-toggle="tab">Заказы мне</a></li>
+                <li role="presentation"><a href="#aukc" aria-controls="aukc" role="tab" data-toggle="tab">Аукционы</a></li>
+                <li role="presentation"><a href="#sales" aria-controls="sales" role="tab" data-toggle="tab">Распродажа</a></li>
+              </ul>
+
+              <!-- Tab panes -->
+              <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="market">
+
+
+                    <table class="table table-striped">
+                        <thead> <tr> <th>Наименование</th> <th>Категория</th> <th>Цена</th> <th>Дата публикации</th> <th>статистика</th></tr> </thead>
+
+                        {% if market %}
+                            <tbody>
+
+                            {% for item in market %}
+                            <tr>
+                            <td id="markname"> {{ item.name }}
+                                <div id="action">
+                                    <a href="#"> Edit </a>
+                                    <a href="{% url 'advdetail' item.pk %}"> View </a>
+                                </div>
+                            </td>
+                            <td>{{ item.subcategory }}</td>
+                            <td>{{ item.price }}</td>
+                            <td>{{ item.creation_date|date:'d.m.Y' }}</td>
+{#                            <td>{{ item.order_item_goods.all.count }}</td>#}
+                            <td> <a href="#" data-toggle="tooltip" data-placement="top" title="Кол-во заказов">
+                                    <i class="fa fa-trash-o"></i> {{ item.order_count }}</a>
+
+                                 <a href="#" data-toggle="tooltip" data-placement="top" title="Кол-во просмотров">
+                                    <i class="fa fa-eye"></i>  {{ item.views }}</a>
+                            </td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>
+
+
+                </div>
+              <div role="tabpanel" class="tab-pane" id="orders">
+
+
+                    <table class="table table-striped">
+                        <thead> <tr> <th>Номер заказа</th> <th>Покупатель</th> <th>Продавец</th> <th>Дата заказа</th> <th>Статус</th></tr> </thead>
+
+                        {% if my_orders %}
+                            <tbody>
+
+                            {% for order in my_orders %}
+                            <tr>
+                            <td>{{ order.pk }}</td>
+                            <td>{{ order.buyer }}</td>
+                            <td>{{ order.seller }}</td>
+                            <td>{{ order.creation_date|date:'d.m.Y' }}</td>
+                            <td>{{ order.order_status }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>
+
+
+                </div>
+              <div role="tabpanel" class="tab-pane" id="orders_">
+
+                    <table class="table table-striped">
+                        <thead> <tr> <th>Номер заказа</th> <th>Покупатель</th> <th>Продавец</th> <th>Дата заказа</th> <th>Статус</th></tr> </thead>
+
+                        {% if orders_to_me %}
+                            <tbody>
+
+                            {% for order in orders_to_me %}
+                            <tr>
+                            <td>{{ order.pk }}</td>
+                            <td>{{ order.buyer }}</td>
+                            <td>{{ order.seller }}</td>
+                            <td>{{ order.creation_date|date:'d.m.Y' }}</td>
+                            <td>{{ order.order_status }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>
+
+              </div>
+
+              </div>
+
+            </div>
+
+
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

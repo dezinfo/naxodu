@@ -1,0 +1,23 @@
+<div id="form-comment">
+    <form action="/comments/post/" method="post">{% csrf_token %}
+
+        {% for field in form %}
+        {% ifequal field.name "email" %}
+            <input type="hidden" name="email" value="{{ email }}" id="id_email" />
+        {% else %}
+        {{ field }}
+        {% endifequal  %}
+        {% endfor %}
+
+{#        {{ form.as_p }}{# just to keep the example simple. Consider using django-crispy-forms in real life #}
+
+        <p>
+            <input type="submit" value="Добавить комментарий"/>
+{#            <input type="hidden" name="next" value="{{ request.get_full_path }}" />#}
+            <input type="hidden" name="next" value="{% url 'article' article.id%}#comment.parent.value" />
+
+
+            <a href="#c0" id="cancel_reply">отменить ответ</a>
+        </p>
+    </form>
+</div>

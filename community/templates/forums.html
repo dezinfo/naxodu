@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load pytils_numeral %}
+{% load humanize %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-8">
+
+            <div class="forum-header">
+
+                <div class="forum-group"> Общие форумы</div>
+                <div class="article-add"> Новая тема
+                                </div>
+            </div>
+
+
+            <div class="forum-title">
+
+
+
+                            <div class="forum-name-title">
+
+                                Название форума
+
+
+
+                            </div>
+
+                            <div class="last-theme">
+
+                                Последняя тема
+                            </div>
+
+
+
+                        </div>
+
+
+                            {% for forum in forums %}
+                            <div class="forum-item">
+
+                                <div class="forum-name">
+
+                                    <a href="{% url 'forum' forum.slug %}">{{ forum.name }}</a>
+                                    <sup> {{ forum.articles_set.count }} {{ forum.articles_set.count|choose_plural:"  тема,  темы,  тем" }}</sup>
+                                    <p>{{ forum.description }}</p>
+                                </div>
+
+                                <div class="forum-last-theme">
+                                    <div class="last-post"><a href="{% url 'article' forum.get_last_article.id %}"> {{ forum.get_last_article.name }}</a></div>
+                                    <div class="sm-author-img-30">
+												<a href="#" class="off" title="{{ forum.get_last_article.username }}"><img src="{{ forum.get_last_article.username.userprofile_set.get.user_image.url }}" width="30" height="30" alt="{{ forum.username }}"></a>
+											</div>
+                                    <div class="author-name">
+               									<a href="#" class="off">{{ forum.get_last_article.username }}</a>
+               									<div class="data"><a href="#" title="Перейти к последнему комментарию">{{ forum.get_last_article.creation_date|naturaltime }} →</a></div>
+               								</div>
+                                </div>
+                                <div class="cl"></div>
+                            </div>
+                            {% endfor %}
+
+
+
+
+
+            </div>
+
+              <div class="col-md-2">
+
+                    list
+                    </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

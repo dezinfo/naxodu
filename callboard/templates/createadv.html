@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+
+{% block social %}
+
+    {{ form.media }}
+
+
+{% endblock %}
+
+{% block content %}
+<div class="container starter-template">
+
+<div class="row">
+<div class="col-lg-10">
+<div class="container-fluid">
+
+{% if next %}
+<form action="{% url 'createadv' %}?next={{ request.GET.next }}" method="post" enctype="multipart/form-data">
+{%else%}
+<form action="{% url 'createadv' %}" method="post" enctype="multipart/form-data">
+{% endif %}
+
+
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+
+
+    {% if next %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} Добавить
+    {% endbuttons %}
+</form>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}

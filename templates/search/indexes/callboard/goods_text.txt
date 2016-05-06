@@ -1,0 +1,4 @@
+{{ object.auto_name }}
+{{ object.description }}
+{{ object.content_type }}
+{{ object.is_active }}
