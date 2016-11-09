@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load set_url_param %}
+
+
+{% block content %}
+
+
+
+{#        <div class="col-md-3">#}
+{##}
+{#            <form method="GET" action="{% url 'callboard' %}">#}
+{##}
+{#                {{ filter_form.as_p }}#}
+        {#    <input type="hidden" name="q" value = {{ request.GET.q }}>#}
+{#            <input type="hidden" name="sort" value = {{ request.GET.sort }}>#}
+{#            <input type="submit"  class="btn btn-default"> Фильтр </input>#}
+{#            </form>#}
+{#            <a href='{% url 'callboard' %}'>Очистить фильтр</a>#}
+{#            </div>#}
+<div class="row">
+
+{#START----------- для callboard#}
+   {% if callboard %}
+
+       {% include 'callboard_base.html' %}
+
+   {% endif %}
+{#END----------- для callboard#}
+
+
+{#START----------- для user_shop#}
+    {% if user_shop %}
+
+        Магазин пользователя <a href="{{ user_shop.userprofiletable_set.get.get_absolute_url }}">{{ user_shop.username }}</a>
+
+    {% endif %}
+{#END----------- для user_shop#}
+
+</div>
+
+
+
+
+    <div class="row">
+
+        <div style="padding-left: 150px">
+        <a href="{% url_set_param sort="price" %}" class="link-blue" ><span> По цене </span></a>
+        <a href="{% url_set_param sort="rate" %}" class="link-blue" ><span> По рейтингу </span></a>
+        <a href="{% url_set_param sort="update_date" %}" class="link-blue" ><span> По дате </span></a>
+
+
+        Сортировка по %{{ sort }}
+        </div>
+        <div class="col-md-12 col-sm-11 col-xs-11" style="padding-left: 100px">
+        {% if object_list.count == 0 %}
+
+            Нет результатов поиска
+        {% else %}
+            {% include 'product_list.html' with content=object_list %}
+        {% endif %}
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+

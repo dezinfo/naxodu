@@ -4,12 +4,15 @@
 
 {% block social %}
 
-    {{ form.media }}
+{{ form.media }}
 
 
 {% endblock %}
 
+
+
 {% block content %}
+
 <div class="container starter-template">
 
 <div class="row">
@@ -24,6 +27,7 @@
 
 
     {% csrf_token %}
+
     {% bootstrap_form form %}
 
 
@@ -33,7 +37,7 @@
     {% endif %}
     {% buttons %}
     <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "star" %} Добавить
+            {% bootstrap_icon "star" %} Добавить </button>
     {% endbuttons %}
 </form>
 </div>

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="row">
+<div class="col-lg-10">
+<div class="container-fluid">
+    {% if next %}
+<form action="{% url 'createforum' %}?next={{ request.GET.next }}" method="post" enctype="multipart/form-data">
+{%else%}
+<form action="{% url 'createforum'  %}" method="post" enctype="multipart/form-data">
+{% endif %}
+
+
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+    <img id="blah" src="#" alt="Фото" style="height: 100px; width: 100px"/>
+    <a href="#" id="rotate"> Повернуть картинку</a>
+    {% if next %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} Добавить </button>
+    {% endbuttons %}
+</form>
+</div>
+</div>
+</div>
+
+    <script>
+
+
+    document.getElementById('rotate').onclick = function() {
+    console.log('put link')
+        jQuery("#blah").rotate(90);
+    }
+
+
+
+
+    function readURL(input) {
+
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#blah').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$("#id_image").change(function(){
+    readURL(this);
+});
+
+
+    </script>
+{% endblock %}

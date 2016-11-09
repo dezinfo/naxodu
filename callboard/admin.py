@@ -4,21 +4,28 @@ from callboard.models import *
 # Register your models here.
 
 
-class SubTypeAdmin(admin.ModelAdmin):
-  model = SubType
-  list_display = ['admin_name',]
+
 
 class SubCategoryAdmin(admin.ModelAdmin):
   model = SubCategory
   list_display = ['admin_name',]
 
-admin.site.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+  model = Category
+  list_display = ['admin_name',]
+
+admin.site.register(Category,CategoryAdmin)
 admin.site.register(SubCategory,SubCategoryAdmin)
 admin.site.register(Goods)
-admin.site.register(SubCategoryAttr)
-admin.site.register(Attributes)
+admin.site.register(CatType)
+
 admin.site.register(GoodsImageGallery)
 admin.site.register(Type)
-admin.site.register(SubType,SubTypeAdmin)
+admin.site.register(CurrencyRate)
+admin.site.register(Attribute)
+admin.site.register(AttributeValue)
+admin.site.register(AttributeMap)
+
+
 
 

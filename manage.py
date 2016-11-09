@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import os
 import sys
-
+# import django.core.management.commands.runserver as runserver
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "avtocry.settings")
+    # runserver.DEFAULT_PORT="8001"
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sxodu.settings")
 
     from django.core.management import execute_from_command_line
 

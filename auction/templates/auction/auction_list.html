@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load set_url_param %}
+
+{% block content %}
+
+
+    <div class="row">
+
+    <div class="col-md-3">
+         <div class="search-auct">
+        <form method="GET" action="{% url 'auction' %}">
+
+        {{ filter_form.as_p }}
+    <input type="hidden" name="q" value = {{ request.GET.q }}>
+    <input type="hidden" name="sort" value = {{ request.GET.sort }}>
+             <div id="submit-btn">
+
+            <button type="submit" class="auct btn btn-primary"> Фильтр </button>
+
+             </div>
+    </form>
+    <div style="text-align: right; margin-right: 30px; font-size: 12px">
+             <a href='{% url 'auction' %}' style="align: right">Очистить фильтр</a>
+    </div>
+    </div>
+    </div>
+
+
+    <div class="col-md-8">
+        {% include 'auctions.html' with object_list=object_list %}
+
+    </div>
+
+</div>
+
+
+{% endblock %}

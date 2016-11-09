@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load threadedcomments_tags %}
+{% load pytils_numeral %}
+{% load humanize %}
+{% load addthis %}
+
 
 {% block javascript %}
     <script type="text/javascript">
@@ -24,40 +28,113 @@
         })
 
     </script>
+
+
+
+
 {% endblock %}
 
 
 {% block content %}
-<div class="container-fluid">
-<div class="article-header">
-    {% get_comment_list for article as comment_list %}
+<div class="container">
 
-    <p> {{ article.forum }}</p>
+    <div class="row">
+        <div class="col-md-8">
+        <div class="content-bl-left">
+        <div class="forums-content">
+            <div class="div back-link">
+              <a href="{% url 'forum' article.forum_slug %}" title="Назад к списку тем">← Вернуться в раздел {{ article.forum }}</a>
 
-    <p>{{ article.name }}</p>
-
-
-    {{ article.media }}
-    {{ article.body|safe }}
-
-</div>
-
- <div class="views"> Views {{ article.views }}</div>
- <div class="views"> Autor {{ article.username }}</div>
-</div>
-
-    <div class="comments_wrapper" id="comments">
-        {% render_comment_list for article %}
+            </div>
+            {% get_comment_list for article as comment_list %}
 
 
-        {% if username %}
-        <div id="wrap_write_comment">
-            {% render_comment_form for article %}
+            <h2 class="title24"> {{ article.name }}</h2>
+
+
+            <div class="list-comm-bl">
+                <div class="list-comm-bl-head">
+                    <div class="title-comm-list">
+
+                          {{ comment_list|length }} {{ comment_list|length|choose_plural:" Комментарий, Комментария, Комментариев" }}
+
+                    </div>
+                </div>
+                <div class="list-comm-bl-body">
+                    <div class="comm-item comment-item has-hover-show">
+                        <div class="comment-block">
+                            <div class="comm-author-img">
+                                <a href="{{article.username.userprofiletable_set.get.get_absolute_url}}" title="{{ article.username }}" class="off">
+                                    <img src="{{ article.username.userprofiletable_set.get.user_image.url }}" alt="{{ article.username }}">
+                                </a>
+
+                            </div>
+
+                            <div class="comm-message">
+                                <div class="comm-info">
+                                    <a href="#">#</a>
+                                    <span class="info-author">
+                                        <a href="{{article.username.userprofiletable_set.get.get_absolute_url}}">{{ article.username }}</a>
+                                    </span>
+                                    {{ article.creation_date|naturaltime }}
+                                    -
+                                    Просмотров {{ article.views }}
+
+                                </div>
+
+                                <div class="comment-content comment-text">
+                                            {{ article.media }}
+                                            {{ article.body|safe }}
+
+
+                                <div class="addthis_inline_share_toolbox"></div>
+                                </div>
+
+
+
+                            </div>
+
+
+
+                           <div class="cl"></div>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+
+            </div>
+
         </div>
-        {% endif %}
 
+<div class="cl"></div>
+    <div class="comments_wrapper" id="comments">
+    {% render_comment_list for article %}
+
+
+    {% if username %}
+    <div id="wrap_write_comment">
+        {% render_comment_form for article %}
+    </div>
+    {% endif %}
+
+
+
+</div>
 
 
     </div>
+</div>
+
+
+
+
+
+</div>
+
+
+
+{% addthis_widget %}
 
 {% endblock %}
+

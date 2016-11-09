@@ -3,8 +3,10 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from pytils.translit import slugify
 import itertools
+from django.db.models import Max
 
 # Create your models here.
+from threadedcomments.models import ThreadedComment
 
 
 def get_upload_file_name(instance, filename):
@@ -38,7 +40,7 @@ class Forums(models.Model):
 class Articles(models.Model):
     forum = models.ForeignKey(Forums,verbose_name='Форум')
     name = models.CharField(max_length=200,verbose_name='Заголовок')
-    body = RichTextUploadingField(verbose_name='Описание')
+    body = RichTextUploadingField(verbose_name='Описание', config_name='default')
     username = models.ForeignKey(User)
     creation_date = models.DateTimeField(verbose_name='date published',auto_now_add=True)
     slug = models.SlugField(max_length=70,unique=True,blank=True)
@@ -51,6 +53,30 @@ class Articles(models.Model):
     class Meta:
         managed=True
 
+    def get_absolute_url(self):
+        return "/community/article/%i/" % self.id
+
+
+
+    def get_last_comment_obj(self):
+         last_comment = ThreadedComment.objects.filter(object_pk=self.pk).order_by('-pk')[:1]
+
+
+            # сделать выборку последнего коммента
+         return last_comment
+
+
+    def get_last_comment(self):
+         last_comment = ThreadedComment.objects.filter(object_pk=self.pk).order_by('-pk')[:1]
+
+         for i in last_comment:
+
+             url = i.pk;
+
+
+         # сделать выборку последнего коммента
+
+         return url
 
     def save(self,*args,**kwargs):
 

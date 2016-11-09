@@ -1,0 +1,44 @@
+<table class="table table-striped">
+                        <thead> <tr>
+                                <th class="table-name"> Наименование<span><a href="#"> <i class="sort-ico fa fa-sort-alpha-asc"></i></a></span></th>
+                                <th>Категория</th>
+                                <th class="table-price" style="width: 150px; text-align: center">Цена<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc" id="table-price-i"></i></a></th>
+                                <th class="" style="width: 150px; text-align: center">Дата публикации<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc" style="color: green"></i></a></th>
+                                <th class="" style="width: 150px; text-align: center">Дата изменения<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc"></i></a></th>
+                                <th>Cтатистика</th>
+                                </tr>
+                        </thead>
+
+                        {% if market %}
+                            <tbody>
+
+                            {% for item in market %}
+                            <tr>
+                            <td id="markname"> {{ item.name }}
+                                <div id="action">
+                                    <a href="{% url 'editadvert' item.pk%}"> Edit </a>
+                                    <a href="{% url 'advdetail' item.pk %}"> View </a>
+                                </div>
+                            </td>
+                            <td>{{ item.subcategory }}</td>
+                            <td>{{ item.price }}</td>
+                            <td>{{ item.creation_date|date:'d.m.Y' }}</td>
+                            <td>{{ item.update_date|date:'d.m.Y' }}</td>
+
+{#                            <td>{{ item.order_item_goods.all.count }}</td>#}
+                            <td> <a href="#" data-toggle="tooltip" data-placement="top" title="Кол-во заказов">
+                                    <i class="fa fa-trash-o"></i> {{ item.order_count }}</a>
+
+                                 <a href="#" data-toggle="tooltip" data-placement="top" title="Кол-во просмотров">
+                                    <i class="fa fa-eye"></i>  {{ item.views }}</a>
+                            </td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>

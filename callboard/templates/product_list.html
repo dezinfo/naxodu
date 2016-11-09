@@ -1,0 +1,162 @@
+{% load thumbnail %}
+{% load static %}
+{% load humanize %}
+{% load cut_time %}
+{% load comment_last %}
+{% load el_pagination_tags %}
+{% load bootstrap3 %}
+
+<div class="container-fluid main-adv">
+    {% if content %}
+
+        {% paginate 16 content %}
+
+        {% for i in content %}
+            {% if not i.is_aukc %}
+            <div class="advertisement">
+                <div class="listing-wrapper">
+                    {% thumbnail i.get_image "x200" crop="top" as im %}
+                        <div class="image-wrapper">
+                        <a href="{% url 'advdetail' i.pk %}">
+
+                        {% if i.is_salles %}
+                            <div class="for_sale" title="Старая цена {{ i.ua_price.2}} грн. Скидка {{ i.sales_percent }}%">
+                                <img src="{% static 'images/for_sale.png' %}" width="50px" height="50px"
+                                     style="display: inline">
+                            </div>
+                        {% endif %}
+
+                        <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" class="listing-image"
+                             style="display: inline">
+
+                    {% endthumbnail %}
+                    </a>
+                    </div>
+                    <div class="listing-info">
+
+                        <a href="{{ i.subcategory.get_absolute_url }}"><span class="listing-category" title='В категории "{{ i.category }}"'> {{ i.subcategory }}</span></a>
+                        <p class="listing-title" title="{{ i.name }}"
+                           style="word-wrap: break-word;">{{ i.name|truncatechars:60 }}</p>
+
+
+                        <div class="listing-price">
+
+                            <div class="detail-left">
+                                            <span class="listing-date">
+                                                <i class="fa fa-clock-o" title="Добавлено"></i><text
+                                                    class="space">{{ i.creation_date|timesince|upto:',' }}</text>
+                                            </span>
+                                            <span class="listing-views">
+                                                <i class="fa fa-eye" title="Просмотров"></i> <text
+                                                    class="space"> {{ i.views }}</text>
+                                            </span>
+{#                                            <span class="listing-comments">#}
+{#                                                <i class="fa fa-comment-o" title="Комментариев"></i><text class="space">#}
+{#                                                0#}
+{#                                            </text>#}
+{#                                            </span>#}
+
+                            </div>
+
+
+                            <div class="detail-right">
+                                <span class="listing-prices">
+                                        <strong><span class="listing-price-text">
+
+                                            {% if i.is_aukc %}
+
+                                                Аукцион
+
+                                            {% else %}
+                                            <sup>грн.</sup>
+                                            {% if i.is_salles %}
+                                                  <text class="sales"
+                                                        title="Старая цена {{ i.ua_price.2 }} грн. Скидка {{ i.sales_percent }}%">
+                                                      {{ i.ua_price.0|intcomma  }}
+
+                                                  </text><br />
+                                                  <text class="old-price"> <sup>грн.</sup><strike>({{ i.ua_price.2|intcomma }})</strike></text>
+                                                  <text class="old-price-per">(-{{ i.sales_percent }}%)</text>
+                                              {% else %}
+
+                                                  {{ i.ua_price.0|intcomma}}
+
+                                              {% endif %}
+
+                                            {% endif %}
+                                        </span></strong>
+                                </span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        {% endif %}
+        {% endfor %}
+        <div>
+         <div style="clear:both;"></div>
+
+            {% get_pages %}
+
+ {% if  pages.paginated  %}
+
+
+       <nav aria-label="Page navigation">
+        <ul class="pagination">
+
+{#разобраться с пагинацией при большом кол-ве страниц#}
+{#    <li>#}
+{##}
+{##}
+{#        {% if pages.previous %}#}
+{#      <li><a href="?page={{ pages.previous.number }}">&laquo;</a></li>#}
+{#    {% else %}#}
+{#      <li class="disabled"><span>&laquo;</span></li>#}
+{#    {% endif %}#}
+{##}
+{#    </li>#}
+
+        {% show_pages %}
+
+{#     {% for page in pages %}#}
+{##}
+{#        {{ pages.current }}pages.current == page.number {{ page.is_current }}#}
+{##}
+{#         {% if  page.is_current  %}#}
+{##}
+{##}
+{#         <li class="active"><a href="?page={{  page.number  }}">{{ page.number }}</a></li>#}
+{#         {% else %}#}
+{#         <li><a href="?page={{  page.number  }}">{{ page.number }}</a></li>#}
+{#          {% endif %}#}
+{#    {% endfor %}#}
+
+{#     <li>#}
+{##}
+{##}
+{##}
+{##}
+{#      {% if pages.next %}#}
+{#      <li><a href="?page={{ pages.next.number }}">&raquo;</a></li>#}
+{#    {% else %}#}
+{#      <li class="disabled"><span>&raquo;</span></li>#}
+{#    {% endif %}#}
+{##}
+{#    </li>#}
+
+  </ul>
+</nav>
+
+
+ {% endif %}
+
+
+
+        </div>
+    {% endif %}
+
+</div>

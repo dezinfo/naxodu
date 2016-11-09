@@ -1,0 +1,63 @@
+{% load thumbnail %}
+
+
+
+        <table class="table table-striped">
+                        <thead> <tr>
+                                <th class="table-photo" style="width: 150px;"></th>
+                                <th class="table-name"> Описание</th>
+
+                                <th class="table-price" style="width: 150px; text-align: center">Текущая цена<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc" id="table-price-i"></i></a></th>
+                                <th class="" style="width: 150px; text-align: center">Ко-во ставок<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc" style="color: green"></i></a></th>
+                                <th class="" style="width: 160px; text-align: center">Дата завершения<a href="#"> <i class="sort-ico fa fa-sort-numeric-asc"></i></a></th>
+                                <th>Экспресс цена</th>
+                                </tr>
+                        </thead>
+
+
+                            <tbody>
+
+                           {% for foo in object_list %}
+
+                                {% if not foo.is_canceled %}
+                            <tr>
+                            <td id="auc_description">
+                                {% thumbnail foo.product.get_image "x80" crop="top" as im %}
+                                <div class="image-wrapper" style="float: left">
+                                    <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" class="listing-image"
+                                        style="display: inline">
+
+                                </div>
+                                {% endthumbnail %}
+                            </td>
+                            <td>
+
+                                <a href="{% url 'advdetail' foo.product.pk %}"> {{ foo.product.name }}</a>
+                            </td>
+
+                            <td class="td-center">{{ foo.current_price }}</td>
+                            <td class="td-center">{{ foo.bets }}</td>
+                            <td class="td-center">{{ foo.end_date|date:'d.m.y в '}}{{ foo.end_date|time:"H:i" }}</td>
+                            <td class="td-center"> {{ foo.end_price }}</td>
+
+                            
+                            </tr>
+
+                                    {% endif %}
+                             {% endfor %}
+                            </tbody>
+
+        </table>
+
+
+{#       <p id ="#i{{ foo.pk }}"> <a href="{% url 'advdetail' foo.product.pk %}"> {{ foo.product.name }}</a>#}
+{#        Начальная цена {{ foo.start_price }}#}
+{#        Текущая цена {{ foo.current_price.0 }}#}
+{#        Всего ставок {{ foo.bets }}#}
+{#        След. мин. ставка {{ foo.min_price_step|add:foo.current_price.1 }}#}
+{#        Экспресс цена {{ foo.end_price }}#}
+{#        </p>#}
+
+{#        <a href="{% url 'give_end_price' foo.pk request.user.id %}"> Предложить лучшую цену</a>#}
+
+

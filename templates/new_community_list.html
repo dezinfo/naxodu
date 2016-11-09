@@ -1,0 +1,56 @@
+{% load threadedcomments_tags %}
+{% load humanize %}
+{% load cut_time %}
+{% load comment_last %}
+{% load static %}
+<div class="blk">
+ <div class="main-block-post">
+
+                                <div class="main-block-header">
+                                    <p>Новое в сообществах</p>
+
+                                    {% if forums %}
+                                        {% for forum in forums %}
+                                            {% get_comment_count for forum as forum_count %}
+
+                                            <div class="top-day-item">
+                                                <div class="top-day-name">
+
+                                                    <a href="{% url 'forum' forum_name=forum.forum_slug %}" title="{{ forum.forum }}"
+                                                       class="blog-link">{{ forum.forum }}</a> →
+                                                    <a href="{% url 'article' forum.id %}"
+                                                       title="{{ forum.name }}">{{ forum.name|truncatechars:60 }}</a>
+                                                </div>
+                                                <div class="author">
+
+                                                    <a href="{{ forum.username.userprofiletable_set.get.get_absolute_url }}"
+                                                       class="m off">{{ forum.username }}</a>
+                                                </div>
+                                                <div class="data-publ">{{ forum.creation_date|naturaltime }}</div>
+
+                                                <div class="cl"></div>
+                                                <div class="rating">
+                                                    <i class="fa fa-thumbs-o-up" title="Лайки"> <span class="counter-like">0</span></i>
+                                                    <i class="fa fa-eye" title="Кол-во просмотров" ><span class="counter-views">{{ forum.views }}</span></i>
+
+                                                    {% if forum_count > 0 %}
+                                                    <a href="{% url 'article' forum.id %}#c{{ forum.id|last_comment }}">
+                                                        <i class="fa fa-comment-o" title="Комментарии"><span class="counter-com">{{ forum_count }}</span></i></a>
+                                                    {% else %}
+                                                    <i class="fa fa-comment-o" title="Комментарии"><span class="counter-com">{{ forum_count }}</span></i>
+                                                    {% endif %}
+
+                                                </div>
+                                                 </div>
+
+                                        {% endfor %}
+
+                                    {% endif %}
+                                </div>
+ <div style="clear:both;"></div>
+
+ </div>
+
+
+</div>
+<div style="clear:both;"></div>

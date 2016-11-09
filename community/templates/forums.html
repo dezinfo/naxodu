@@ -2,6 +2,11 @@
 {% load pytils_numeral %}
 {% load humanize %}
 
+
+{%  block title %}
+    Сообщества
+{% endblock %}
+
 {% block content %}
 
     <div class="container">
@@ -11,20 +16,20 @@
 
             <div class="forum-header">
 
-                <div class="forum-group"> Общие форумы</div>
-                <div class="article-add"> Новая тема
-                                </div>
+                <h5>Создавайте сообщества! Общайтесь на интересующие темы! Объединяйтесь! :)</h5>
+                <br>
+
+                <div class="forum-group-common"> Общие сообщества</div>
+
+
             </div>
 
 
             <div class="forum-title">
 
-
-
                             <div class="forum-name-title">
 
-                                Название форума
-
+                                Сообщество
 
 
                             </div>
@@ -39,23 +44,23 @@
                         </div>
 
 
-                            {% for forum in forums %}
+                            {% for forum in off_forums %}
                             <div class="forum-item">
 
                                 <div class="forum-name">
 
                                     <a href="{% url 'forum' forum.slug %}">{{ forum.name }}</a>
-                                    <sup> {{ forum.articles_set.count }} {{ forum.articles_set.count|choose_plural:"  тема,  темы,  тем" }}</sup>
-                                    <p>{{ forum.description }}</p>
+                                    <sup> <em>{{ forum.articles_set.count }} {{ forum.articles_set.count|choose_plural:"  тема,  темы,  тем" }}</em></sup>
+                                    <p>{{ forum.description|truncatechars:120 }}</p>
                                 </div>
 
                                 <div class="forum-last-theme">
-                                    <div class="last-post"><a href="{% url 'article' forum.get_last_article.id %}"> {{ forum.get_last_article.name }}</a></div>
+                                    <div class="last-post"><a href="{% url 'article' forum.get_last_article.id %}" title="{{ forum.get_last_article.name}}"> {{ forum.get_last_article.name|truncatechars:35 }}</a></div>
                                     <div class="sm-author-img-30">
-												<a href="#" class="off" title="{{ forum.get_last_article.username }}"><img src="{{ forum.get_last_article.username.userprofile_set.get.user_image.url }}" width="30" height="30" alt="{{ forum.username }}"></a>
+												<a href="#" class="off" title="{{ forum.get_last_article.username }}"><img src="{{ forum.get_last_article.username.userprofiletable_set.get.user_image.url }}" width="30" height="30" alt="{{ forum.username }}"></a>
 											</div>
                                     <div class="author-name">
-               									<a href="#" class="off">{{ forum.get_last_article.username }}</a>
+               									<a href="{{forum.get_last_article.username.userprofiletable_set.get.get_absolute_url}}" class="off">{{ forum.get_last_article.username }}</a>
                									<div class="data"><a href="#" title="Перейти к последнему комментарию">{{ forum.get_last_article.creation_date|naturaltime }} →</a></div>
                								</div>
                                 </div>
@@ -65,16 +70,76 @@
 
 
 
+            <div class="forum-header">
+
+                <div class="forum-group"> Пользовательские сообщества</div>
+                <div class="article-add"> <a href="{% url 'createforum' %}?next={{ request.path|urlencode }}"> <i class="fa fa-plus"> </i> Создать сообщество</a>
+                </div>
+            </div>
+
+
+            <div class="forum-title">
+
+                            <div class="forum-name-title">
+
+                                Сообщество
+
+
+                            </div>
+
+                            <div class="last-theme">
+
+                                Последняя тема
+                            </div>
+
+
+
+                        </div>
+
+
+                            {% for forum in user_forums %}
+                            <div class="forum-item">
+
+                                <div class="forum-name">
+
+                                    <a href="{% url 'forum' forum.slug %}">{{ forum.name }}</a>
+                                    <sup> {{ forum.articles_set.count }} {{ forum.articles_set.count|choose_plural:"  тема,  темы,  тем" }}</sup>
+                                    <p>{{ forum.description|truncatechars:120}}</p>
+                                </div>
+
+
+                                {%  if forum.articles_set.count > 0 %}
+                                <div class="forum-last-theme">
+                                    <div class="last-post"><a href="{% url 'article' forum.get_last_article.id %}" title="{{ forum.get_last_article.name}}"> {{ forum.get_last_article.name|truncatechars:35 }}</a></div>
+                                    <div class="sm-author-img-30">
+												<a href="#" class="off" title="{{ forum.get_last_article.username }}"><img src="{{ forum.get_last_article.username.userprofiletable_set.get.user_image.url }}" width="30" height="30" alt="{{ forum.username }}"></a>
+											</div>
+                                    <div class="author-name">
+               									<a href="{{forum.get_last_article.username.userprofiletable_set.get.get_absolute_url}}" class="off">{{ forum.get_last_article.username }}</a>
+               									<div class="data"><a href="#" title="Перейти к последней теме">{{ forum.get_last_article.creation_date|naturaltime }} →</a></div>
+               								</div>
+                                </div>
+                                {% endif %}
+
+                                <div class="cl"></div>
+                            </div>
+                            {% endfor %}
 
 
             </div>
 
-              <div class="col-md-2">
+              <div class="col-md-4" style="padding-left: 30px; margin-top: 100px;">
 
-                    list
-                    </div>
+                    {% include 'new_community_list.html' with forums=forums %}
+
+              </div>
+
+
 
         </div>
+
+
+
 
     </div>
 

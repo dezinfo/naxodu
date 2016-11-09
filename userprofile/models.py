@@ -1,30 +1,60 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 
 from community.models import Forums
 from django.contrib.auth.models import User
+from smart_selects.db_fields import ChainedForeignKey
 
 MAIL_STATUS = (('Unread','Не прочитано'),('Readed','Прочитано'))
 
 # Create your models here.
-class UserProfile(models.Model):
+
+class States(models.Model):
+    state = models.CharField(max_length=100)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.state)
+
+class Cities(models.Model):
+    state = models.ForeignKey(States)
+    city = models.CharField(max_length=120)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.city)
+
+class UserProfileTable(models.Model):
     username = models.ForeignKey(User,blank=True, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=20,verbose_name='Имя',blank=True,null=True)
+    last_name = models.CharField(max_length=40,verbose_name='Фамилия',blank=True,null=True)
     favorites = models.ManyToManyField(User, related_name='favorited_by_user',blank=True)
     user_image = models.ImageField(verbose_name='Аватар',blank=True,default=settings.STATIC_URL+'images/avatar.jpeg')
-    adress_city = models.CharField(verbose_name='Город',max_length=60,blank=True)
+    adress_state = models.ForeignKey(States,verbose_name='Область',blank=True,null=True,)
+    adress_city =  ChainedForeignKey(
+        Cities,
+        chained_field="adress_state",
+        chained_model_field="state",
+        show_all=False,
+        auto_choose=False, verbose_name='Город',blank=True,null=True
+        )
     discount_percent = models.IntegerField(verbose_name='Процент скидки',default=5)
-
+    phone = models.IntegerField(verbose_name='Телефон',blank=True,null=True)
+    skype = models.CharField(max_length=100,verbose_name='Скайп',blank=True,null=True)
 
     def __str__(self):              # __unicode__ on Python 2
         return str(self.username)
 
 
+    def get_absolute_url(self):
+
+        return  reverse('userprofile', kwargs={'username': self.username})
+
 def create_user_profile(sender, instance, created, **kwargs):
 
     if created:
 
-        UserProfile.objects.create(username=instance)
+        UserProfileTable.objects.create(username=instance)
 
 
 

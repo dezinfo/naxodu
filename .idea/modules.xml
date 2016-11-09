@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/avtocry.iml" filepath="$PROJECT_DIR$/.idea/avtocry.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sxodu.iml" filepath="$PROJECT_DIR$/.idea/sxodu.iml" />
     </modules>
   </component>
 </project>

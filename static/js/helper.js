@@ -40,7 +40,10 @@ $(document).ready(function(){
         console.log(this.pathname)
         console.log(location.pathname)
     if (this.pathname == location.pathname) $(this).parent().addClass('active');
-    });
+    }
+
+
+    );
 
 
 
@@ -78,7 +81,21 @@ $(document).ready(function(){
 //    });
 //};
 
+$('.category').click(function(){
+
+        console.log('Нажал');
+
+
 });
+
+
+});
+
+
+
+
+
+
 
 
 $(function () {

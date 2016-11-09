@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container starter-template" xmlns="http://www.w3.org/1999/html">
+
+    <div class="row">
+        <div class="col-md-8">
+
+            <div>
+
+              <!-- Nav tabs -->
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#market" aria-controls="market" role="tab" data-toggle="tab">Моя витрина</a></li>
+
+                <li role="presentation"><a href="#orders_" aria-controls="orders_" role="tab" data-toggle="tab">Заказы</a></li>
+                <li role="presentation"><a href="#orders" aria-controls="orders" role="tab" data-toggle="tab">Мои покупки</a></li>
+                <li role="presentation"><a href="#aukc" aria-controls="aukc" role="tab" data-toggle="tab">Аукционы</a></li>
+                <li role="presentation"><a href="#sales" aria-controls="sales" role="tab" data-toggle="tab">Распродажа</a></li>
+              </ul>
+
+              <!-- Tab panes -->
+              <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="market">
+
+
+                    {% include 'user_product_list.html' with market=market %}
+
+
+                </div>
+              <div role="tabpanel" class="tab-pane" id="orders">
+
+
+                    <table class="table table-striped">
+                        <thead> <tr> <th>Номер заказа</th> <th>Покупатель</th> <th>Продавец</th> <th>Дата заказа</th> <th>Статус</th></tr> </thead>
+
+                        {% if my_orders %}
+                            <tbody>
+
+                            {% for order in my_orders %}
+                            <tr>
+                            <td>{{ order.pk }}</td>
+                            <td>{{ order.buyer }}</td>
+                            <td>{{ order.seller }}</td>
+                            <td>{{ order.creation_date|date:'d.m.Y' }}</td>
+                            <td>{{ order.order_status }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>
+
+
+                </div>
+              <div role="tabpanel" class="tab-pane" id="orders_">
+
+                    <table class="table table-striped">
+                        <thead> <tr> <th>Номер заказа</th> <th>Покупатель</th> <th>Продавец</th> <th>Дата заказа</th> <th>Статус</th></tr> </thead>
+
+                        {% if orders_to_me %}
+                            <tbody>
+
+                            {% for order in orders_to_me %}
+                            <tr>
+                            <td>{{ order.pk }}</td>
+                            <td>{{ order.buyer }}</td>
+                            <td>{{ order.seller }}</td>
+                            <td>{{ order.creation_date|date:'d.m.Y' }}</td>
+                            <td>{{ order.order_status }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        {% endif %}
+
+
+
+
+                    </table>
+
+              </div>
+
+              </div>
+
+            </div>
+
+
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+</div>
+
+<script type='text/javascript'>
+$(function() {
+
+    $('#table-price-i').click(function () {
+
+        console.log($(this).css('color'))
+
+        if ($(this).css('color') == 'rgb(0, 128, 0)') {
+
+        console.log('Click ' + $('#table-price-i').attr('class'));
+
+        if ($('#table-price-i').attr('class') == 'fa fa-sort-numeric-asc') {
+            $('#table-price-i').attr('class', 'fa fa-sort-numeric-desc');
+            $('#table-price-i').css('color', 'green')
+
+        }
+        else {
+
+            $('#table-price-i').attr('class', 'fa fa-sort-numeric-asc');
+
+
+        }
+
+     }
+
+     else {
+
+            var elems = document.getElementsByClassName("sort-ico");
+            for (var i = 0; i < elems.length; i++)
+                elems[i].style.color = "#337ab7";
+
+            $(this).attr('class','fa fa-sort-numeric-asc');
+            $('#table-price-i').css('color', 'green')
+
+        }
+
+    })
+});
+</script>
+
+
+{% endblock %}

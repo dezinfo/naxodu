@@ -1,35 +1,40 @@
 {% load static %}
 {%  load staticfiles %}
 {% load message_count %}
+{% load addthis %}
+
 <!DOCTYPE html>
-<html lang="ru" xmlns="http://www.w3.org/1999/html" ng-app="avtocry" prefix="og: http://ogp.me/ns#">
+<html lang="ru">
   <head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+   {% block social %} {% endblock %}
+    <title>
+    {% block title %}
 
+    {% endblock %}
 
-
-    <title>Starter Template for Bootstrap</title>
+    - НаХоду
+    </title>
 
 
     {% block extra_css %}
         <!-- TODO: Delete this if Smart-Selects solve this problem -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="{% static 'smart-selects/admin/js/chainedfk.js' %}"></script>
+
     {% endblock %}
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap.min.css" %}">
-
     <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'slick/slick.css' %}"/>
-
-
-
     <link rel="stylesheet" type="text/css" href="{% static 'slick/slick-theme.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'blueimp-gallery/css/blueimp-gallery.min.css' %}"/>
+
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
 
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -46,40 +51,18 @@
 
     <script type="text/javascript" src="{% static 'slick/slick.js' %}"></script>
     <script type="text/javascript" src="{% static "js/helper.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/rotate.js" %}"></script>
 
     <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
     <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
-   <script type="text/javascript" src="{% static "js/app.js" %}"></script>
 
 
 
 
-  <script>
-  $(function() {
 
 
 
-        $('#search').autocomplete({
-            source: function (request, response) {
-                $.getJSON("/autocomplete/?q=" + request.term, function (data) {
-                    console.log(data.results);
-                    response(data.results || []);
-                });
-            },
-            minLength: 3
-        });
-  });
-  </script>
-
-
-    {% block social %}
-
-
-    {% endblock %}
-
-
-    {% block javascript %}{% endblock %}
+    {% block javascript_top %}{% endblock %}
     {% block extrahead %}{% endblock %}
 
   </head>
@@ -106,8 +89,9 @@
                 </button>
 
             <a class="navbar-brand" href="/">
-                <i class="glyphicon glyphicon-headphones"></i>
-                <p class="text-small tagline"><strong>Продавалка</strong></p>
+
+                <p class="text-small tagline"><strong>На Ходу</strong></p>
+
             </a>
         </div>
 
@@ -127,38 +111,38 @@
       </form> -->
 
 
-<form class="navbar-form navbar-left hidden-xs" method="get" action="{%   url 'autocomplete' %}" autocomplete="on">
+<form class="navbar-form navbar-left hidden-xs" method="get" action="{%   url 'autocomplete' %}" autocomplete="on" id="search-form">
                     <div class="form-group search-bar">
 
 <div class="search-wrapper">
-    <input type="search" id="search" name="q" class="form-control user-search" placeholder="Поиск" value="" maxlength="100">
-    <a id="querysubmit" href="#" class="icon-search-link"><i class="icon-search glyphicon glyphicon-search"></i></a>
+    <input type="search" id="search" name="q" class="form-control user-search" placeholder="Поиск" value="" autocomplete="on"  maxlength="100">
+    <a id="querysubmit" type="submit" class="icon-search-link" onclick="document.getElementById('search-form').submit(); return false;"><i class="icon-search glyphicon glyphicon-search"></i></a>
+
+
 </div>
-
-
 
                     </div>
 
-                </form>
+</form>
 
 
- {% if username %}
+ {% if request.user.username %}
       <ul class="nav navbar-nav navbar-left hidden-xs">
 
 
 
               <li class="dropdown">
-                        <a href="#" role="button" data-toggle="dropdown" aria-expanded="false" title="{{ username }}">
-                            <div class="profile-icon" id="profile-letter">{{ uw }}</div>
+                        <a href="#" role="button" data-toggle="dropdown" aria-expanded="false" title="{{ request.user.username }}">
+                            <div class="profile-icon" id="profile-letter">{{ request.user.username|user_name }}</div>
                             <i class="nav-icon glyphicon glyphicon-chevron-down"></i>
                         </a>
 
             <ul class="dropdown-menu" role="menu">
             <li class="table-layout">
-                <a href="#" class="padded-link">Профиль({{ username }})</a>
+                <a href=" {{  request.user.userprofiletable_set.get.get_absolute_url }}" class="padded-link">Профиль({{ request.user.username }})</a>
             </li>
             <li>
-                <a href="{% url 'orders'  username   %}" class="padded-link" rel="nofollow">Мой магазин</a>
+                <a href="{% url 'pruduct_list'  request.user.username   %}" class="padded-link" rel="nofollow">Мой магазин</a>
             </li>
             <li>
                 <a href="#" class="padded-link">Сообщения</a>
@@ -169,10 +153,14 @@
           </ul>
 
               <li>
-                        <a href="{% url 'inbox' %}" title="Сообщения" class="gw-messages">
+                        <a href="{% url 'postman:inbox' %}" title="Сообщения" class="gw-messages">
                             <i class="mes-icon glyphicon glyphicon-envelope"></i>
                             {% if request.user.is_authenticated %}
-                                <span class="badge">{{ request.user|unread_messages }}</span>
+{#                                <span class="badge">{{ request.user|unread_messages }}</span>#}
+                                {% if postman_unread_count > 0 %}
+                                <span class="badge">{{ postman_unread_count }}</span>
+                                {% endif %}
+
                             {% endif %}
 
 
@@ -211,87 +199,78 @@
 <div class="navbar navbar-default">
   <div class="navbar-ul">
     <ul class="nav" id="nav-menu">
-      <li><a href="{% url 'catalog' %}">Компании</a></li>
-      <li><a href="{% url 'reviews' %}">Обзоры</a></li>
-	  <li><a href="{% url 'forums' %}">Форумы</a></li>
-      <li><a href="/board/">Витрина</a></li>
-      <li><a href="/rate/">Рейтинг продавцов</a></li>
-      <li><a href="/aukc/">Аукционы</a></li>
+{#      <li><a href="{% url 'reference' %}">Рекомендую</a></li>#}
+      <li><a href="{% url 'callboard' %}">Витрина</a></li>
+      <li><a href="/auction/">Аукционы</a></li>
       <li><a href="/sale/">Распродажа</a></li>
+      <li><a href="{% url 'reviews' %}">Обзоры</a></li>
+	  <li><a href="{% url 'forums' %}">Сообщества</a></li>
+      <li><a href="/rate/">Рейтинг продавцов</a></li>
     </ul>
   </div>
 </div>
 
+    {% block postman_menu %}
 
+
+    {% endblock %}
+
+
+  <div class="wrapper">
      {% block content %}
 
 
      {% endblock %}
+</div>
 
 
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  {% block javascript %}
 
+  {% endblock %}
 
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-{#<script type="text/javascript">var switchTo5x=true;</script>#}
-{#<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>#}
-{#<script type="text/javascript">stLight.options({publisher: "f36c7441-4d9c-4af6-b793-65d5e0882633", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>#}
 
 </body>
-
-
 
 <footer>
     <div class="container-fluid footer-container">
         <div class="row">
             <div class="col-xs-6 col-sm-3 col-md-2 col-md-offset-1 no-padding">
-                <ul>
-                    <li><a rel="nofollow" class="link" href="#">For Buyers</a></li>
-                    <li><a rel="nofollow" class="link" href="#">For Sellers</a></li>
-                    <li><a rel="nofollow" class="link" href="#">For Partners</a></li>
-                    <li><a rel="nofollow" class="link" href="#">Privacy</a></li>
-                    <li><a class="link" href="#">Sitemap</a></li>
-                </ul>
+
+                    <p><a rel="nofollow" class="link" href="#">Для продавцов</a></p>
+                    <p><a rel="nofollow" class="link" href="#">Для покупателей</a></p>
+                    <p><a rel="nofollow" class="link" href="#">О нас</a></p>
+                    <p><a rel="nofollow" class="link" href="#">FAQ</a></p>
+
+
             </div>
 
-            <div class="col-xs-6 col-sm-3 col-md-2 no-padding">
-                <ul>
-                    <li><a rel="nofollow" class="link" href="/about#story">Company Info</a></li>
-                    <li><a rel="nofollow" class="link" href="/about#contact">Contact</a></li>
-                    <li><a rel="nofollow" class="link" href="https://angel.co/panjo/jobs">Careers</a></li>
-                    <li><a rel="nofollow" class="link" href="/about#faq">About / FAQ</a></li>
-                    <li><a rel="nofollow" class="link" href="/terms">Terms &amp; Conditions</a></li>
-                </ul>
+
+            <div class="col-xs-12 col-sm-4 col-md-5 no-padding">
+
+
+                    <a href="#" class="btn btn-primary btn-block" style="display: flex;
+    align-items: center;
+    justify-content: center">Обратная связь</a>
+
+
+                    <br>
+                <br>
+                <br>
+                    <p class="copyright"> © НаХоду 2016 Тоговая площадка для перфекционистов</p>
+
+
+
             </div>
 
-            <div class="col-xs-12 col-sm-3 col-md-2 no-padding">
-                <ul>
-                    <li class="link"><b>For General Support:</b></li>
-                    <li class="link">1 (424) 272-0291</li>
-                    <li><a rel="nofollow" class="link" href="mailto:support@panjo.com?subject=Support">support@panjo.com</a></li>
-                    <li><a href="/support" class="btn btn-primary btn-block">Support</a></li>
-                </ul>
-            </div>
 
-            <div class="col-xs-12 col-sm-3 text-center no-padding">
-                <ul class="format">
-                    <li class="social">
-                        <a rel="nofollow" href="https://panjo-marketplace.blogspot.com/" target="_blank"><img src="/Content/images/img_blogger.png" alt="Blogger"></a>
-                    </li>
-                    <li class="social">
-                        <a rel="nofollow" href="https://www.facebook.com/panjomarketplace" target="_blank"><img src="/Content/images/img_facebook.png" alt="Facebook"></a>
-                    </li>
-                    <li class="social">
-                        <a href="https://plus.google.com/117056618134889803020" rel="publisher" target="_blank"><img src="/Content/images/img_googlePlus.png" alt="Google Plus"></a>
-                    </li>
-                    <li class="social">
-                        <a rel="nofollow" href="https://twitter.com/panjomarket" target="_blank"><img src="/Content/images/img_twitter.png" alt="Twitter"></a>
-                    </li>
-                    <li class="copyright">© Panjo 2016 Interactive Innovation Group, Inc.</li>
-                </ul>
-            </div>
         </div>
     </div>
+
+
 </footer>
+
+
 
 
 </html>

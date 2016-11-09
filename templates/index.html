@@ -17,6 +17,10 @@
   {% endblock %}
 
 
+{%  block title %}
+    Главная
+{% endblock %}
+
 {% block content %}
 
 
@@ -64,129 +68,25 @@
 
 
                 <div class="row">
-                        <p> <a href="{% url 'notes' %}"> Поиск </a> </p>
+
+
+
                     <div class="col-md-9">
+                    <div class="align-left" style="text-align: left ; margin-left: 40px; padding-bottom: 5px"> <b>Новое на витрине.</b> <a href="{% url 'callboard' %}"> Смотреть все</a></div>
+{#блок с объявлениями#}
 
-                    <div class="container-fluid main-adv">
-                        {% if content %}
-
-                            {% for i in content %}
-                                <div class="advertisement">
-                                    <div class="listing-wrapper">
-                                        {% thumbnail i.get_image "x200" crop="top" as im %}
-                                    <div class="image-wrapper">
-                                            <a href="{% url 'advdetail' i.pk %}">
-
-                                            {% if i.is_salles %}
-                                                <div class="for_sale" title="Старая цена {{ i.price }} грн. Скидка {{ i.sales_percent }}%">
-                                                <img src="{% static 'images/for_sale.png' %}" width="50px" height="50px"  style="display: inline">
-                                                </div>
-                                            {% endif %}
-
-                                            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" class="listing-image" style="display: inline">
-
-                                    {% endthumbnail %}
-                                        </a>
-                                    </div>
-                                    <div class= "listing-info">
-
-                                    <span class="listing-category" title='{{ i.category }}'> {{ i.subcategory }}</span>
-                                    <p class="listing-title" title="{{ i.name }}" style="word-wrap: break-word;">{{ i.name|truncatechars:60 }}</p>
-
-
-                                        <div class="listing-price">
-
-                                         <div class="detail-left">
-                                            <span class="listing-date">
-                                                <i class="fa fa-clock-o" title="Добавлено"></i><text class="space">{{ i.creation_date|timesince|upto:','  }}</text>
-                                            </span>
-                                            <span class="listing-views">
-                                                <i class="fa fa-eye" title="Просмотров"></i> <text class="space"> {{ i.views }}</text>
-                                            </span>
-                                            <span class="listing-comments">
-                                                <i class="fa fa-comment-o" title="Комментариев"></i><text class="space">0</text>
-                                            </span>
-
-                                          </div>
-
-
-                                         <div class="detail-right">
-                                            <span class="listing-prices"><sup>грн.</sup>
-                                                    <strong><span class="listing-price-text">
-
-                                                          {% if i.is_salles %}
-                                                                    <text class="sales" title="Старая цена {{ i.price }} грн. Скидка {{ i.sales_percent }}%">
-                                                                        {{ i.actual_price }}
-                                                                    </text>
-                                                          {% else %}
-
-                                                                   {{ i.actual_price }}
-
-                                                          {% endif %}
-
-
-                                                    </span></strong>
-                                            </span>
-                                        </div>
-
-
-                                    </div>
-                                    </div>
-                                    </div>
-
-                                </div>
-
-
-                            {% endfor %}
-
-                        {% endif %}
+                    {% include 'product_list.html' with content=content %}
 
                     </div>
-                    </div>
 
-
+{#новое в сообществах#}
                     <div class="col-md-3">
                         <div class="row">
-                            <div class="main-block-post">
 
-                                <div class="main-block-header">
-                                    <p>Новое в форумах</p>
+                            {% include 'new_community_list.html' with forums=forums %}
+                            <div style="text-align: right; margin-right: 5px;margin-top: 3px"><a href="{% url 'forums' %}"> Смотреть все </a></div>
 
-                                    {% if forums %}
-                                        {% for forum in forums %}
-                                            {% get_comment_count for forum as forum_count %}
 
-                                            <div class="top-day-item">
-                                                <div class="top-day-name">
-
-                                                    <a href="{% url 'forum' forum_name=forum.forum_slug %}" title="{{ forum.forum }}"
-                                                       class="blog-link">{{ forum.forum }}</a> →
-                                                    <a href="{% url 'article' forum.id %}"
-                                                       title="{{ forum.name }}">{{ forum.name|truncatechars:60 }}</a>
-                                                </div>
-                                                <div class="author">
-
-                                                    <a href="http://smotra.ru/users/docent1982/"
-                                                       class="m off">{{ forum.username }}</a>
-                                                </div>
-                                                <div class="data-publ">{{ forum.creation_date|naturaltime }}</div>
-
-                                                <div class="cl"></div>
-                                                <div class="rating">
-                                                    <i class="fa fa-thumbs-o-up" title="Лайки"> <span class="counter-like">0</span></i>
-                                                    <i class="fa fa-eye" title="Кол-во просмотров" ><span class="counter-views">{{ forum.views }}</span></i>
-                                                    <a href="{% url 'article' forum.id %}#c{{ forum.id|last_comment }}">
-                                                        <i class="fa fa-comment-o" title="Комментарии"><span class="counter-com"
-                                                       href="{% url 'article' forum.id %}#c{{ forum.id|last_comment }}"
-                                                       >{{ forum_count }}</span></i></a>
-                                                </div>
-                                                 </div>
-
-                                        {% endfor %}
-
-                                    {% endif %}
-                                </div>
-                            </div>
                         </div>
 
                         <div class="row">
@@ -209,7 +109,7 @@
                                                 </div>
                                                 <div class="author">
 
-                                                    <a href="http://smotra.ru/users/docent1982/"
+                                                    <a href="{{ forum.username.userprofiletable_set.get.get_absolute_url }}"
                                                        class="m off">{{ forum.username }}</a>
                                                 </div>
                                                 <div class="data-publ">{{ forum.creation_date|naturaltime }}</div>
@@ -242,28 +142,7 @@
     </div>
 
 
-
-
-
-
-
-<script type="text/javascript">(function(w,doc) {
-if (!w.__utlWdgt ) {
-    w.__utlWdgt = true;
-    var d = doc, s = d.createElement('script'), g = 'getElementsByTagName';
-    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
-    s.src = ('https:' == w.location.protocol ? 'https' : 'http')  + '://w.uptolike.com/widgets/v1/uptolike.js';
-    var h=d[g]('body')[0];
-    h.appendChild(s);
-}})(window,document);
-</script>
-<div data-background-alpha="0.0" data-buttons-color="#FFFFFF" data-counter-background-color="#ffffff"
-     data-share-counter-size="12" data-top-button="false" data-share-counter-type="disable"
-     data-share-style="1" data-mode="share" data-like-text-enable="false" data-mobile-view="true"
-     data-icon-color="#ffffff" data-orientation="horizontal" data-text-color="#000000" data-share-shape="round"
-     data-sn-ids="fb.vk.tw." data-share-size="20" data-background-color="#ffffff" data-preview-mobile="false"
-     data-mobile-sn-ids="fb.vk.tw.wh.ok.vb." data-pid="1504393" data-counter-background-alpha="1.0"
-     data-following-enable="false" data-exclude-show-more="false" data-selection-enable="true" class="uptolike-buttons" ></div>
+    
 
 
 

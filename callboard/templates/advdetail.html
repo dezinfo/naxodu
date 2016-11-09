@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
-
+{% load static %}
+{% load humanize %}
+{% load mathfilters %}
+{% load addthis %}
 
 {% block social %}
-    <meta property="og:title" content="Заголовок "/>
-    <meta property="og:type" content="advert"/>
-    <meta property="og:image" content="http://site.name/image-url"/>
-    <meta property="og:description" content="Описание 30-40 слов"/>
+
+    <meta property="og:title" content="{{ adv.name }}" />
+    <meta property="og:description" content="Watch the AddThis Tour video." />
+    <meta property="og:image" content="http://i2.ytimg.com/vi/1F7DKyFt5pY/default.jpg" />
+    <meta property="og:url" content="http://i2.ytimg.com" />
 
 
 {% endblock %}
@@ -22,9 +26,11 @@
                 <div class="row hidden-xs">
                     <div class="col-xs-12 col-sm-9 breadcrumbs">
                         <ol class="breadcrumb">
+
+
                             <li><a href="/">Home</a></li>
-                            <li><a href="{% url 'category' adv.category.slug %}">{{ adv.category }}</a></li>
-                            <li><a href="{% url 'subcategory' adv.subcategory.slug %}">{{ adv.subcategory }}</a></li>
+                            <li><a href="{{ adv.category.get_absolute_url }}">{{ adv.category.name }}</a></li>
+                            <li><a href="{{ adv.subcategory.get_absolute_url }}">{{ adv.subcategory.name     }}</a></li>
                         </ol>
                     </div>
                 </div>
@@ -48,9 +54,46 @@
                                         <!-- Listing Images Column -->
                                         <div class="col-xs-12 col-md-7 images-col">
                                             <div class="listing-images">
+                                                <!--   добавить слайдер с фото -->
 
-                                             <!--   добавить слайдер с фото -->
+                                                <div id="blueimp-gallery" class="blueimp-gallery">
+                                                    <div class="slides"></div>
+                                                    <h3 class="title"></h3>
+                                                    <a class="prev">‹</a>
+                                                    <a class="next">›</a>
+                                                    <a class="close">×</a>
+                                                    <a class="play-pause"></a>
+                                                    <ol class="indicator"></ol>
+                                                </div>
 
+                                                <div id="blueimp-gallery-carousel"
+                                                     class="blueimp-gallery blueimp-gallery-carousel">
+                                                    <div class="slides"></div>
+                                                    <h3 class="title"></h3>
+                                                    <a class="prev">‹</a>
+                                                    <a class="next">›</a>
+                                                    <a class="play-pause"></a>
+                                                    <ol class="indicator"></ol>
+                                                </div>
+
+
+                                                {% if fotolist %}
+                                                    <div id="links">
+                                                        {% for foto in fotolist %}
+
+                                                            <a href="{{ foto.file.url }}" title="{{ foto.good.name }}">
+
+                                                               <img src="{{ foto.file.url }}" style="width: 50px">
+
+
+                                                            </a>
+                                                        {% endfor %}
+
+                                                    </div>
+                                                {% endif %}
+
+
+                                                <!--   добавить слайдер с фото -->
                                             </div>
                                         </div>
                                         <!-- End Listing Images Column -->
@@ -58,10 +101,48 @@
                                         <!-- Item Details Column -->
                                         <div class="col-xs-12 col-sm-5 hidden-sm details-col">
                                             <div class="listing-details-main">
+                                                 {% if adv.is_salles %}
                                                 <div id="detail-cost-wrapper" class="detail-cost-wrapper text-center">
-                                                    <span class="listing-price-text title formatted"><sup>грн.</sup>{{ adv.price }}</span>
+                                                    <span class="listing-price-text title formatted">
+
+{#                                                        <sup>{{ adv.ua_price.1|safe }}</sup>#}
+
+                                                        {{ adv.salles_price|intcomma }} {{ adv.ua_price.1|safe }}
+
+
+
+                                                    </span>
+                                                    <input type="hidden" value="{{ adv.salles_price }}" id="list-price">
+                                                </div>
+
+
+                                                 <div class="sale-detail">
+                                                 Старая цена
+                                                 <span class="old-price">
+                                                        {{ adv.price|intcomma }} {{ adv.ua_price.1|safe }}
+                                                 </span>
+                                                 </div>
+
+
+                                                 <div class="sale-detail">
+                                                     Вы экономите
+
+                                                     <span class="old-price-per">
+                                                       {{ adv.price|sub:adv.salles_price|intcomma }} {{ adv.ua_price.1|safe }}
+                                                 </span>
+                                                     </div>
+
+                                                {% else %}
+                                                <div id="detail-cost-wrapper" class="detail-cost-wrapper text-center">
+                                                    <span class="listing-price-text title formatted">
+                                                        {{ adv.price|intcomma  }} {{ adv.ua_price.1|safe }}
+                                                        </span>
                                                     <input type="hidden" value="{{ adv.price }}" id="list-price">
                                                 </div>
+
+                                                 {% endif %}
+
+
 
                                                 <div class="hidden-xs">
                                                     <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
@@ -103,7 +184,7 @@
                                             <div class="hidden-xs">
                                                 <p class="text-medium text-center description-header">
                                                     <strong>Описание</strong></p>
-                                                <p class="listing-date text-light hidden-sm">Добавлено </p>
+
                                             </div>
 
                                             <div class="collapse in" id="description">
@@ -124,512 +205,21 @@
                                     <!-- ReactJS Comments Components-->
                                     <div class="col-xs-12 hidden-xs hidden-sm">
                                         <div id="listing-comments-desktop">
-                                            <div class="comments-container" data-reactid=".0">
-                                                <div class="comments-wrapper" data-reactid=".0.0"><p
+                                            <div class="comments-container">
+                                                <div class="comments-wrapper"><p
                                                         class="text-medium text-center comments-header"
-                                                        data-reactid=".0.0.0"><strong data-reactid=".0.0.0.0">0
-                                                    Comments</strong></p>
-                                                    <div data-reactid=".0.0.1">
-                                                        <form role="form" class="comment-form" data-reactid=".0.0.1.0">
-                                                            <textarea class="form-control comment-box"
-                                                                      placeholder="Start typing your comment"
-                                                                      data-reactid=".0.0.1.0.0"></textarea>
-                                                            <button type="submit"
-                                                                    class="btn btn-primary comment-submit-btn"
-                                                                    data-reactid=".0.0.1.0.1">Добавить комментарий
-                                                            </button>
-                                                            <div class="text-center" data-reactid=".0.0.1.0.2"><p
-                                                                    class="text-warning hidden"
-                                                                    data-reactid=".0.0.1.0.2.0"></p>
-                                                                <p class="text-success hidden"
-                                                                   data-reactid=".0.0.1.0.2.1"></p></div>
-                                                        </form>
-                                                        <a href="#" class="leave-comment-link" data-reactid=".0.0.1.1">Leave
-                                                            a Comment</a></div>
-                                                    <div class="comment-list" data-reactid=".0.0.2"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-12 visible-sm">
-                                        <div id="listing-comments-tablet">
-                                            <div class="comments-container" data-reactid=".1">
-                                                <div class="comments-wrapper" data-reactid=".1.0"><p
-                                                        class="text-medium text-center comments-header"
-                                                        data-reactid=".1.0.0"><strong data-reactid=".1.0.0.0">0
-                                                    Comments</strong></p>
-                                                    <div data-reactid=".1.0.1">
-                                                        <form role="form" class="comment-form" data-reactid=".1.0.1.0">
-                                                            <textarea class="form-control comment-box"
-                                                                      placeholder="Start typing your comment"
-                                                                      data-reactid=".1.0.1.0.0"></textarea>
-                                                            <button type="submit"
-                                                                    class="btn btn-primary comment-submit-btn"
-                                                                    data-reactid=".1.0.1.0.1">Добавить комментарий
-                                                            </button>
-                                                            <div class="text-center" data-reactid=".1.0.1.0.2"><p
-                                                                    class="text-warning hidden"
-                                                                    data-reactid=".1.0.1.0.2.0"></p>
-                                                                <p class="text-success hidden"
-                                                                   data-reactid=".1.0.1.0.2.1"></p></div>
-                                                        </form>
-                                                        <a href="#" class="leave-comment-link" data-reactid=".1.0.1.1">Leave
-                                                            a Comment</a></div>
-                                                    <div class="comment-list" data-reactid=".1.0.2"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-12 visible-xs">
-                                        <div class="section-container listing-comments">
-                                            <a role="button" data-toggle="collapse" href="#commenting"
-                                               aria-expanded="false" aria-controls="commenting">
-                                                <p>Comments</p><i class="icon-drop_down_arrow"></i>
-                                            </a>
-
-                                            <div class="collapse in" id="commenting">
-                                                <div class="collapse-wrapper">
-                                                    <div id="listing-comments-mobile">
-                                                        <div class="comments-container" data-reactid=".2">
-                                                            <div class="comments-wrapper" data-reactid=".2.0"><p
-                                                                    class="text-medium text-center comments-header"
-                                                                    data-reactid=".2.0.0"><strong
-                                                                    data-reactid=".2.0.0.0">0 Comments</strong></p>
-                                                                <div data-reactid=".2.0.1">
-                                                                    <form role="form" class="comment-form"
-                                                                          data-reactid=".2.0.1.0"><textarea
-                                                                            class="form-control comment-box"
-                                                                            placeholder="Start typing your comment"
-                                                                            data-reactid=".2.0.1.0.0"></textarea>
-                                                                        <button type="submit"
-                                                                                class="btn btn-primary comment-submit-btn"
-                                                                                data-reactid=".2.0.1.0.1">Добавить
-                                                                            комментарий
-                                                                        </button>
-                                                                        <div class="text-center"
-                                                                             data-reactid=".2.0.1.0.2"><p
-                                                                                class="text-warning hidden"
-                                                                                data-reactid=".2.0.1.0.2.0"></p>
-                                                                            <p class="text-success hidden"
-                                                                               data-reactid=".2.0.1.0.2.1"></p></div>
-                                                                    </form>
-                                                                    <a href="#" class="leave-comment-link"
-                                                                       data-reactid=".2.0.1.1">Leave a Comment</a></div>
-                                                                <div class="comment-list" data-reactid=".2.0.2"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-12 visible-xs">
-
-                                        <div class="row mobile-col">
-                                            <!--Right promo test -->
-
-                                            <div class="col-xs-12 visible-sm">
-
-
-                                                <div class="listing-details-main">
-                                                    <div id="detail-cost-wrapper"
-                                                         class="detail-cost-wrapper text-center">
-                                                        <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>
-                                                        <input type="hidden" value="35" id="list-price">
-                                                    </div>
-
-                                                    <div class="hidden-xs">
-                                                        <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
-                                                           class="btn btn-orange text-center text-medium buy-now-btn"
-                                                           attr-marketplace="BMW MOA">Купить</a>
-
-                                                    </div>
-
-
-                                                    <p class="text-right comments-anchor">
-                                                        <a href="#listing-comments-desktop">0 Comments</a>
-                                                    </p>
-                                                </div>
-
-
-                                            </div>
-
-                                            <div class="col-xs-12">
-                                                <div class="section-container side-container seller-info-container">
-                                                    <div class="visible-xs">
-                                                        <a role="button" data-toggle="collapse" href="#verifications"
-                                                           aria-expanded="false" aria-controls="verifications">
-                                                            <p>О продавце</p><i class="icon-drop_down_arrow"></i>
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="hidden-xs">
-                                                        <p class="side-headline text-center"><strong>О продавце</strong>
-                                                        </p>
-                                                    </div>
-
-                                                    <div class="collapse" id="verifications">
-                                                        <div class="collapse-wrapper">
-                                                            <p><a href="#" class="link-blue">{{ adv.user.username }}</a>
-                                                            </p>
-                                                            <p>
-                                                                <i class="fa fa-star filled"></i>
-                                                                <i class="icon-star filled"></i>
-                                                                <i class="icon-star filled"></i>
-                                                                <i class="icon-star"></i>
-                                                                <i class="icon-star"></i>
-                                                                <a href="/profile/67114/kneeslider#feedback-container"
-                                                                   class="feedback-count">
-                                                                    <span>(3)</span>
-                                                                </a>
-                                                            </p>
-
-
-                                                            <div class="verifications-container">
-                                                                <div class="verification-wrapper">
-                                                                    <div class="verification-icon">
-                                                                        <i class="icon-check_s"></i>
-                                                                    </div>
-                                                                    <div class="verification-text">
-                                                                        <p>Panjo</p>
-
-                                                                        <p class="text-small">Sold 14, Bought 0</p>
-
-                                                                        <p class="text-small">Member Since: June '15</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="verification-wrapper">
-                                                                    <div class="verification-icon">
-                                                                        <i class="icon-check_s"></i>
-                                                                    </div>
-                                                                    <div class="verification-text">Verified Email</div>
-                                                                </div>
-                                                                <div class="verification-wrapper">
-                                                                    <div class="verification-icon">
-                                                                        <i class="icon-check_s"></i>
-                                                                    </div>
-                                                                    <div class="verification-text">PayPal</div>
-                                                                </div>
-
-                                                                <div class="verification-wrapper">
-                                                                    <div class="verification-icon">
-                                                                        <i class="icon-check_s"></i>
-                                                                    </div>
-                                                                    <div class="verification-text">
-                                                                        <p>BMW MOA</p>
-                                                                        <p class="text-small">Username: kneeslider</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <p class="text-center"><a
-                                                                        href="/profile/67114/kneeslider"
-                                                                        class="link-blue">View Store</a></p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-12 hidden-xs">
-                                                <div class="side-container share-links-side">
-                                                    <div class="share-links-container">
-                                                        <span class="share-this share-headline text-center"><strong>Поделиться</strong></span>
-
-
-                                                        <div data-background-alpha="0.0"
-                                                             data-buttons-color="#FFFFFF"
-                                                             data-counter-background-color="#ffffff"
-                                                             data-share-counter-size="12"
-                                                             data-top-button="false" data-share-counter-type="disable"
-                                                             data-share-style="1" data-mode="share"
-                                                             data-like-text-enable="false" data-mobile-view="true"
-                                                             data-icon-color="#ffffff"
-                                                             data-orientation="horizontal" data-text-color="#000000"
-                                                             data-share-shape="round"
-                                                             data-sn-ids="fb.vk.tw." data-share-size="20"
-                                                             data-background-color="#ffffff"
-                                                             data-preview-mobile="false"
-                                                             data-mobile-sn-ids="fb.vk.tw.wh.ok.vb." data-pid="1504393"
-                                                             data-counter-background-alpha="1.0"
-                                                             data-following-enable="false"
-                                                             data-exclude-show-more="false"
-                                                             data-selection-enable="true"
-                                                             class="uptolike-buttons"></div>
-
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-12 text-center">
-                                                <div class="section-container side-container community-container">
-                                                    <div class="visible-xs">
-                                                        <a role="button" data-toggle="collapse" href="#community"
-                                                           aria-expanded="false" aria-controls="community">
-                                                            <p>About BMW MOA</p><i class="icon-drop_down_arrow"></i>
-                                                        </a>
-                                                    </div>
-
-                                                    <div class="hidden-xs">
-                                                        <p class="side-headline text-center">
-                                                            <strong>{{ adv.subcategory }}</strong>
-                                                        </p>
-                                                    </div>
-
-                                                    <div class="collapse" id="community">
-                                                        <div class="collapse-wrapper">
-                                                            <div class="community-img-container">
-                                                                <a href="{% url 'subcategory' adv.subcategory.slug %}">
-                                                                    {% thumbnail adv.subcategory.image "x76" crop="top" as im %}
-                                                                        <img src="{{ im.url }} " width="{{ im.width }}"
-                                                                             height="{{ im.height }}"
-                                                                             alt="Forum image" class="img-responsive"
-                                                                             title="BMW MOA">
-
-                                                                    {% endthumbnail %}
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="follow-btn-container">
-                                                                <a href="javascript:void(0);" class="btn btn-follow"
-                                                                   data-mktplace-id="1151"
-                                                                   data-mktplace-title="BMW MOA">
-                                                                    <div class="icon-container">
-                                                                        <i class="icon-add"></i>
-                                                                    </div>
-                                                                    <div class="follow-text-container"></div>
-                                                                </a>
-                                                            </div>
-
-                                                            <p class="text-center text-small">2667 Following</p>
-
-                                                            <div class="subpanjo-links">
-
-
-                                                                <div class="hidden-xs">
-                                                                    <div class="col-xs-12">
-                                                                        <div class="additional-items-container">
-                                                                            <div class="row">
-                                                                                <div class="col-xs-12">
-
-
-
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="row text-center">
-                                                                                <!-- Quick View Modal-->
-
-
-                                                                                <!-- Additional Listing Result -->
-                                                                                <div id="listing-result-180590"
-                                                                                     class="col-sm-6 col-md-4 col-lg-3 listing col-centered listing-result-180590">
-                                                                                    <div class="row listing-dropdown text-center hidden-xs hidden-sm">
-                                                                                        <div class="col-xs-12 no-padding col-centered">
-                                                                                            <a href="javascript:void(0);"
-                                                                                               class="bookmark-this"
-                                                                                               rel="nofollow"
-                                                                                               data-listing-id="180590">+
-                                                                                                Add To Wishlist</a>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <a href="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490">
-                                                                                    </a>
-                                                                                    <div class="listing-wrapper"><a
-                                                                                            href="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490">
-                                                                                        <meta itemprop="name"
-                                                                                              content="2001 BMW R1150GS">
-                                                                                        <meta itemprop="image"
-                                                                                              content="http://imagecdn2.panjo.com/images/thumb/sJaCZGxXyZbG.jpg">
-                                                                                        <meta itemprop="url"
-                                                                                              content="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490">
-
-                                                                                        <div class="listing-image-wrapper"
-                                                                                             title="2001 BMW R1150GS">
-                                                                                            <img src="https://imagecdn2.panjo.com/images/panjogrid/tmp.png"
-                                                                                                 class="listing-image lazyload"
-                                                                                                 data-src="https://imagecdn2.panjo.com/images/thumbretina/sJaCZGxXyZbG.jpg"
-                                                                                                 alt="2001 BMW R1150GS">
-                                                                                        </div>
-
-                                                                                    </a>
-                                                                                        <div class="listing-info-wrapper text-left">
-                                                                                            <a href="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490">
-                                                                                            </a>
-                                                                                            <p class="listing-title"
-                                                                                               style="word-wrap: break-word;">
-                                                                                                <a href="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490"></a><a
-                                                                                                    href="http://www.panjo.com/buy/2001-bmw-r1150gs-180590?sid=23105490"
-                                                                                                    title="2001 BMW R1150GS">2001
-                                                                                                BMW R1150GS</a></p>
-                <span class="listing-price text-medium">
-                        <strong><span class="listing-price-text no-decimal"><sup>$</sup>3,499</span></strong>
-                </span>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                </div><!-- Quick View Modal-->
-
-
-                                                                                <!-- Additional Listing Result -->
-                                                                                <div id="listing-result-217422"
-                                                                                     class="col-sm-6 col-md-4 col-lg-3 listing col-centered listing-result-217422">
-                                                                                    <div class="row listing-dropdown text-center hidden-xs hidden-sm">
-                                                                                        <div class="col-xs-12 no-padding col-centered">
-                                                                                            <a href="javascript:void(0);"
-                                                                                               class="bookmark-this"
-                                                                                               rel="nofollow"
-                                                                                               data-listing-id="217422">+
-                                                                                                Add To Wishlist</a>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <a href="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490">
-                                                                                    </a>
-                                                                                    <div class="listing-wrapper"><a
-                                                                                            href="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490">
-                                                                                        <meta itemprop="name"
-                                                                                              content="2005 gs12">
-                                                                                        <meta itemprop="image"
-                                                                                              content="http://imagecdn2.panjo.com/images/thumb/2ace0b99-f49c-4f93-a034-53795eecdc0f.JPG">
-                                                                                        <meta itemprop="url"
-                                                                                              content="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490">
-
-                                                                                        <div class="listing-image-wrapper"
-                                                                                             title="2005 gs12">
-                                                                                            <img src="https://imagecdn2.panjo.com/images/panjogrid/tmp.png"
-                                                                                                 class="listing-image lazyload"
-                                                                                                 data-src="https://imagecdn2.panjo.com/images/thumbretina/2ace0b99-f49c-4f93-a034-53795eecdc0f.JPG"
-                                                                                                 alt="2005 gs12">
-                                                                                        </div>
-
-                                                                                    </a>
-                                                                                        <div class="listing-info-wrapper text-left">
-                                                                                            <a href="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490">
-                                                                                            </a>
-                                                                                            <p class="listing-title"
-                                                                                               style="word-wrap: break-word;">
-                                                                                                <a href="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490"></a><a
-                                                                                                    href="http://www.panjo.com/buy/2005-gs12-217422?sid=23105490"
-                                                                                                    title="2005 gs12">2005
-                                                                                                gs12</a></p>
-                <span class="listing-price text-medium">
-                        <strong><span class="listing-price-text no-decimal"><sup>$</sup>4,800</span></strong>
-                </span>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                </div><!-- Quick View Modal-->
-
-
-                                                                                <!-- Additional Listing Result -->
-                                                                                <div id="listing-result-203949"
-                                                                                     class="col-sm-6 col-md-4 col-lg-3 listing col-centered listing-result-203949">
-                                                                                    <div class="row listing-dropdown text-center hidden-xs hidden-sm">
-                                                                                        <div class="col-xs-12 no-padding col-centered">
-                                                                                            <a href="javascript:void(0);"
-                                                                                               class="bookmark-this"
-                                                                                               rel="nofollow"
-                                                                                               data-listing-id="203949">+
-                                                                                                Add To Wishlist</a>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <a href="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490">
-                                                                                    </a>
-                                                                                    <div class="listing-wrapper"><a
-                                                                                            href="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490">
-                                                                                        <meta itemprop="name"
-                                                                                              content="2011 R1200R Classic for sale or trade for G/S, air head, or f800gs adventure.">
-                                                                                        <meta itemprop="image"
-                                                                                              content="http://imagecdn2.panjo.com/images/thumb/f7fe45c1-f409-4532-864c-c6d6c0df25d1.jpg">
-                                                                                        <meta itemprop="url"
-                                                                                              content="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490">
-
-                                                                                        <div class="listing-image-wrapper"
-                                                                                             title="2011 R1200R Classic for sale or trade for G/S, air head, or f800gs adventure.">
-                                                                                            <img src="https://imagecdn2.panjo.com/images/panjogrid/tmp.png"
-                                                                                                 class="listing-image lazyload"
-                                                                                                 data-src="https://imagecdn2.panjo.com/images/thumbretina/f7fe45c1-f409-4532-864c-c6d6c0df25d1.jpg"
-                                                                                                 alt="2011 R1200R Classic for sale or trade for G/S, air head, or f800gs adventure.">
-                                                                                        </div>
-
-                                                                                    </a>
-                                                                                        <div class="listing-info-wrapper text-left">
-                                                                                            <a href="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490">
-                                                                                            </a>
-                                                                                            <p class="listing-title"
-                                                                                               style="word-wrap: break-word;">
-                                                                                                <a href="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490"></a><a
-                                                                                                    href="http://www.panjo.com/buy/2011-r1200r-classic-for-sale-or-trade-for-g-s-air-head-or-f800gs-adventure-203949?sid=23105490"
-                                                                                                    title="2011 R1200R Classic for sale or trade for G/S, air head, or f800gs adventure.">2011
-                                                                                                R1200R Classic for sale
-                                                                                                or trade for G/S, air
-                                                                                                head, or f800gs
-                                                                                                adventure.</a></p>
-                <span class="listing-price text-medium">
-                        <strong><span class="listing-price-text no-decimal"><sup>$</sup>9,500</span></strong>
-                </span>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                </div><!-- Quick View Modal-->
-
-
-                                                                                <!-- Additional Listing Result -->
-
-                                                                            </div>
-
-
-                                                                            <div class="row view-all-container">
-                                                                                <div class="col-xs-12">
-                                                                                    <p>
-                                                                                        <a href="{% url 'subcategory' adv.subcategory.slug %}"
-                                                                                           class="btn btn-primary transparent">Еще предложения</a></p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <p><a href="/p/bmw-motorcycle-owners-of-america">View
-                                                                    Marketplace</a></p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xs-12 sticky-wrapper hidden-xs" style="display: none;">
-                                                <div class="side-container sticky-container">
-                                                    <p class="side-headline text-center"><strong>Kryptonite Bolt Down
-                                                        Lock Anchor</strong></p>
-                                                    <p class="text-center">
-                                                        <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>
-                                                    </p>
-                                                    <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
-                                                       class="btn btn-orange text-center text-medium buy-now-btn"
-                                                       attr-marketplace="BMW MOA">Buy Now</a>
-                                                    <p class="text-center"><img
-                                                            src="/Content/images/panjo/detail/moneyBack.svg"
-                                                            alt="Guarantee"></p>
+                                                ><strong>
+                                                    Другие обьявления продавца</strong></p>
+                                                    <div>
+
+                                                        <a href="#" class="leave-comment-link">Все объявления</a></div>
+                                                    <div class="comment-list"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
 
-                                    <div class="fixed-cta manage-listing-bar visible-xs">
-
-                                        <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
-                                           class="btn btn-orange btn-half" attr-marketplace="BMW MOA" rel="nofollow">Купить
-                                            <strong>$35.00</strong></a>
-                                    </div>
                                 </div>
 
 
@@ -733,7 +323,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <p class="text-center"><a href="/profile/67114/kneeslider"
+                                                        <p class="text-center"><a href="{% url 'user_pruduct_list' adv.user.username %}"
                                                                                   class="link-blue">View Store</a></p>
                                                     </div>
                                                 </div>
@@ -741,32 +331,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xs-12 hidden-xs">
-                                        <div class="side-container share-links-side">
-                                            <div class="share-links-container">
-                                                <span class="share-this share-headline text-center"><strong>Поделиться</strong></span>
-
-                                                <div data-background-alpha="0.0"
-                                                     data-buttons-color="#FFFFFF"
-                                                     data-counter-background-color="#ffffff"
-                                                     data-share-counter-size="12"
-                                                     data-top-button="false" data-share-counter-type="disable"
-                                                     data-share-style="1" data-mode="share"
-                                                     data-like-text-enable="false" data-mobile-view="true"
-                                                     data-icon-color="#ffffff"
-                                                     data-orientation="horizontal" data-text-color="#000000"
-                                                     data-share-shape="round"
-                                                     data-sn-ids="fb.vk.tw." data-share-size="20"
-                                                     data-background-color="#ffffff"
-                                                     data-preview-mobile="false" data-mobile-sn-ids="fb.vk.tw.wh.ok.vb."
-                                                     data-pid="1504393"
-                                                     data-counter-background-alpha="1.0" data-following-enable="false"
-                                                     data-exclude-show-more="false"
-                                                     data-selection-enable="true" class="uptolike-buttons"></div>
-
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <div class="col-xs-12 text-center">
                                         <div class="section-container side-container community-container">
@@ -834,8 +398,9 @@
                                                                     <div class="row view-all-container">
                                                                         <div class="col-xs-12">
                                                                             <p>
-                                                                                <a href="{% url 'subcategory' adv.subcategory.slug %}"
-                                                                                   class="btn btn-primary transparent">Еще предложения</a></p>
+                                                                                <a href="{{ adv.subcategory.get_absolute_url }}"
+                                                                                   class="btn btn-primary transparent">Еще
+                                                                                    предложения</a></p>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -917,7 +482,7 @@
 
                                     <div class="collapse" id="verifications">
                                         <div class="collapse-wrapper">
-                                            <p><a href="#" class="link-blue">{{ adv.user.username }}</a></p>
+                                            <p><a href="#" class="link-blue">{{ adv.user }}</a></p>
                                             <p>
                                                 <i class="fa fa-star filled"></i>
                                                 <i class="fa fa-star filled"></i>
@@ -939,9 +504,9 @@
                                                     <div class="verification-text">
                                                         <p>Panjo</p>
 
-                                                        <p class="text-small">Sold 14, Bought 0</p>
+                                                        <p class="text-small">Продано </p>
 
-                                                        <p class="text-small">Member Since: June '15</p>
+                                                        <p class="text-small">На ходу с: {{ adv.user.date_joined|date:"F, Y" }}</p>
                                                     </div>
                                                 </div>
 
@@ -963,12 +528,12 @@
                                                         <i class="icon-check_s"></i>
                                                     </div>
                                                     <div class="verification-text">
-                                                        <p>BMW MOA</p>
-                                                        <p class="text-small">Username: kneeslider</p>
+                                                        <p>{{ adv.name }}</p>
+
                                                     </div>
                                                 </div>
 
-                                                <p class="text-center"><a href="/profile/67114/kneeslider"
+                                                <p class="text-center"><a href="{% url 'user_pruduct_list' adv.user.username %}"
                                                                           class="link-blue">View Store</a></p>
                                             </div>
                                         </div>
@@ -982,10 +547,7 @@
                                         <span class="share-this share-headline text-center"><strong>Поделиться</strong></span>
 
 
-                                        <div class="pluso" data-background="transparent"
-                                             data-options="medium,round,line,horizontal,nocounter,theme=04"
-                                             data-services="vkontakte,odnoklassniki,facebook,twitter,google"
-                                             data-url="http://127.0.0.1:8000"></div>
+                                        <div class="addthis_inline_share_toolbox"></div>
 
                                     </div>
                                 </div>
@@ -993,27 +555,23 @@
 
                             <div class="col-xs-12 text-center">
                                 <div class="section-container side-container community-container">
-                                    <div class="visible-xs">
-                                        <a role="button" data-toggle="collapse" href="#community" aria-expanded="false"
-                                           aria-controls="community">
-                                            <p>About BMW MOA</p><i class="icon-drop_down_arrow"></i>
-                                        </a>
-                                    </div>
+
 
                                     <div class="hidden-xs">
-                                        <p class="side-headline text-center"><strong>{{ adv.subcategory }} 11</strong>
+                                        <p class="side-headline text-center"><strong>{{ adv.subcategory }}</strong>
                                         </p>
                                     </div>
 
                                     <div class="collapse" id="community">
                                         <div class="collapse-wrapper">
                                             <div class="community-img-container">
-                                                <a href="/p/bmw-motorcycle-owners-of-america">
+                                                <a href="{{ adv.subcategory.get_absolute_url }} ">
 
                                                     {% thumbnail adv.subcategory.image "x76" crop="top" as im %}
                                                         <img src="{{ im.url }} " width="{{ im.width }}"
                                                              height="{{ im.height }}"
-                                                             alt="Forum image" class="img-responsive" title="BMW MOA">
+                                                             alt="Forum image" class="img-responsive"
+                                                             title="{{ adv.subcategory }}">
 
                                                     {% endthumbnail %}
                                                 </a>
@@ -1056,15 +614,17 @@
                                                             <div class="row view-all-container">
                                                                 <div class="col-xs-12">
                                                                     <p>
-                                                                        <a href="{% url 'subcategory' adv.subcategory.slug %}"
-                                                                           class="btn btn-primary transparent"> Еще предложения </a></p>
+                                                                        <a href="{{ adv.subcategory.get_absolute_url }}"
+                                                                           class="btn btn-primary transparent"> Еще
+                                                                            предложения </a></p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <p><a href="/p/bmw-motorcycle-owners-of-america">View Marketplace</a>
+                                                <p><a href="{{ adv.subcategory.get_absolute_url }}">Перейти на
+                                                    ветрину</a>
                                                 </p>
                                             </div>
                                         </div>
@@ -1072,20 +632,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-xs-12 sticky-wrapper hidden-xs" style="display: none;">
-                                <div class="side-container sticky-container" style="">
-                                    <p class="side-headline text-center"><strong>Kryptonite Bolt Down Lock
-                                        Anchor</strong></p>
-                                    <p class="text-center">
-                                        <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>
-                                    </p>
-                                    <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
-                                       class="btn btn-orange text-center text-medium buy-now-btn"
-                                       attr-marketplace="BMW MOA">Buy Now</a>
-                                    <p class="text-center"><img src="/Content/images/panjo/detail/moneyBack.svg"
-                                                                alt="Guarantee"></p>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                     <!-- End Right Column-->
@@ -1108,5 +655,35 @@
             h.appendChild(s);
         }
     })();</script>
+
+{% endblock %}
+
+{% block javascript %}
+
+    {% addthis_widget %}
+
+    <script src="{% static 'blueimp-gallery/js/blueimp-gallery.min.js' %}"></script>
+
+    <script>
+        document.getElementById('links').onclick = function (event) {
+            event = event || window.event;
+            console.log('In into carusele')
+            var target = event.target || event.srcElement,
+                    link = target.src ? target.parentNode : target,
+                    options = {index: link, event: event},
+                    links = this.getElementsByTagName('a');
+            blueimp.Gallery(links, options);
+        };
+    </script>
+
+    <script>
+        blueimp.Gallery(
+                document.getElementById('links').getElementsByTagName('a'),
+                {
+                    container: '#blueimp-gallery-carousel',
+                    carousel: true
+                }
+        );
+    </script>
 
 {% endblock %}

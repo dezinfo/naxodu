@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load pytils_numeral %}
+{% load humanize %}
+{% load threadedcomments_tags %}
+{% load time %}
+
+{% block content %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="forum-name-list">
+                <div class="container-box">
+                    <div class="box">
+
+                        <div style="float: left; width: 650px" >
+                            <h2> {{ forum.name }}
+                            <sup class="nx-count-topics"> {{ forum.articles_set.count }} {{ forum.articles_set.count|choose_plural:"  тема,  темы,  тем" }}</sup>
+
+                            </h2>
+                            <br>
+                            <div>{{ forum.description }}</div>
+                            <br>
+                        </div>
+                        {% if forum.image %}
+
+
+                        <div style="width: 150px; height: 150px">
+                                <img src="{{ forum.image.url }}" style="width: 150px; height: 150px">
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+                <div class="forums-list">
+
+
+
+                    {% for l in forum_list %}
+                    {% get_comment_count for l as forum_count %}
+                    <div class="theme-item">
+
+                        <div class="theme-name">
+                            <a href="{{ l.get_absolute_url }}"> {{ l.name|truncatechars:110 }}</a>
+                        </div>
+
+                        <div class="topic-answer">
+											<div class="count-wrap">
+               									<div class="count">{{ forum_count }}</div>
+               								</div>
+
+                        </div>
+
+
+
+                        {%  if forum_count > 0 %}
+
+
+                        <div class="topic-last-post">
+	                            <div class="forum-last-theme">
+
+                                    <div class="sm-author-img-30">
+												<a href="#" class="off" title="{{ l.get_last_comment_obj.get.user_name }}">
+                                                    <img src="{{ l.get_last_comment_obj.get.user.userprofiletable_set.get.user_image.url }}" width="30" height="30" alt="{{ l.get_last_comment_obj.get.user_name }}"></a>
+
+											</div>
+                                    <div class="author-name">
+               									<a href="{{ l.get_last_comment_obj.get.user.userprofiletable_set.get.get_absolute_url }}" class="off">{{ l.get_last_comment_obj.get.user_name }}</a>
+                                                <div class="data"><a href="{{ l.get_absolute_url }}#c{{ l.get_last_comment_obj.get.pk }}" title="Перейти к последнему комментарию">{{ l.get_last_comment_obj.get.submit_date|naturaltime }} →</a></div>
+               								</div>
+                                </div>
+                        </div>
+
+
+                        {% else %}
+
+
+                        <div class="topic-last-post">
+	                            <div class="forum-last-theme">
+
+                                    <div class="sm-author-img-30">
+												<a href="#" class="off" title="{{ l.username }}"><img src="{{ l.username.userprofiletable_set.get.user_image.url }}" width="30" height="30" alt="{{ forum.username }}"></a>
+                                    </div>
+                                    <div class="author-name">
+               									<a href="{{ l.username.userprofiletable_set.get.get_absolute_url }}" class="off">{{ l.username }}</a>
+               									<div class="data">{{ l.creation_date|naturaltime }}</div>
+                                    </div>
+                                </div>
+                        </div>
+
+                        {% endif %}
+
+
+                    <div class="cl"></div>
+                    </div>
+
+                    {% endfor %}
+
+            </div>
+
+
+        </div>
+
+
+
+
+        <a href="{% url 'newarticle' forum_id %}?next={{ request.path|urlencode }}" class="btn btn-primary" id="nav-button">Добавить тему</a>
+
+    </div>
+
+</div>
+</div>
+{% endblock %}

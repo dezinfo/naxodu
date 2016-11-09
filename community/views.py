@@ -1,13 +1,65 @@
-
 from django.db.models import F
-
 from django.db.models import Max
-from django.shortcuts import render, render_to_response, get_object_or_404, HttpResponse
+from django.shortcuts import render,redirect, render_to_response, get_object_or_404, HttpResponse,HttpResponseRedirect
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_protect
-from django_comments.views.comments import post_comment
-from avtocry.views import getuw
 from community.models import Articles,Forums
+from community.forms import NewArticleForm, CreateForum
+from django.contrib.auth.decorators import login_required
+
+
+
+@login_required
+def createforum (request):
+     args={}
+     form = CreateForum(request.POST, request.FILES)
+     url = request.POST.get('next','/')
+     args['form'] = CreateForum(request.POST, request.FILES)
+     if request.method == 'POST':
+        if form.is_valid():
+            form.instance.username = request.user
+            form.instance.official_status = False
+            form.save()
+
+            return redirect(url, {'username': request.user.username})
+
+
+     return  render(request,'createforum.html', args,context_instance=RequestContext(request))
+
+@login_required
+def newArticle(request,forum_id):
+
+    args={}
+
+    args['forum_id'] = forum_id
+    forum =get_object_or_404(Forums,slug=forum_id)
+
+    if (forum==forum_id) is not None:
+        # uw = getuw(request.user.username)
+        form = NewArticleForm(request.POST)
+        url = request.POST.get('next','/')
+        if request.method == 'POST':
+
+
+            if form.is_valid():
+                form.instance.username = request.user
+                form.instance.forum_id = forum.pk
+                form.save()
+                return redirect(url, {'username': request.user.username})
+
+
+
+        args['username'] = request.user.username
+        # args['uw'] = uw
+        args['form'] = form
+        args['next'] = url
+
+
+        return  render(request,'newarticle.html', args,context_instance=RequestContext(request))
+
+    else:
+
+        return HttpResponseRedirect('/')
 
 
 # Create your views here.
@@ -16,7 +68,7 @@ def getArticle(request, article_id):
 
     args = {}
     args['username'] = request.user.username
-    args['uw'] = getuw(args.get('username'))
+    # args['uw'] = getuw(args.get('username'))
 
     article = get_object_or_404(Articles,id=article_id)
 
@@ -24,8 +76,10 @@ def getArticle(request, article_id):
         args['email'] = request.user.email
 
     test = request.session.get('article_has_viewd_%s' % article_id,False)
-    if request.session.get('article_has_viewd_%s' % article_id)!=True:
-            request.session['article_has_viewd_%s' % article_id] = True
+
+    if (request.session.get('article_has_viewd_%s' % (article_id))!=True or request.session.get('article_has_viewd_%s' % (request.user.username))!=True):
+            request.session['article_has_viewd_%s' % (article_id)] = True
+            request.session['article_has_viewd_%s' % (request.user.username)] = True
             article.views = article.views+1
             article.save()
 
@@ -35,19 +89,34 @@ def getArticle(request, article_id):
 
 
 def getForum(request,forum_name):
-    return HttpResponse('forums -'+forum_name)
+
+
+
+
+
+    forum = get_object_or_404(Forums, slug=forum_name)
+    forum_list = Articles.objects.filter(forum=forum)
+    args={}
+    args['username'] = request.user.username
+    # args['uw'] = getuw(request.user.username)
+    args['forum_id'] = forum_name
+    args['forum_list'] = forum_list
+    args['forum'] = forum
+
+    return render_to_response('forum.html',args,context_instance=RequestContext(request))
 
 
 def forums(request):
     args = {}
     args['username'] = request.user.username
-    args['uw'] = getuw(args.get('username'))
-    args['forums'] = Forums.objects.all()
-
-
+    # args['uw'] = getuw(args.get('username'))
+    args['off_forums'] = Forums.objects.filter(official_status=True)
+    args['user_forums'] = Forums.objects.filter(official_status=False)
+    args['forums'] = Articles.objects.filter().order_by('-creation_date')[:10]
 
 
 
     Articles.objects.annotate(max_date=Max('creation_date')).filter(creation_date=F('max_date'))
+
     return render_to_response('forums.html',
                               args,context_instance=RequestContext(request))
