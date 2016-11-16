@@ -44,8 +44,9 @@ def index(request):
     # args['uw'] = getuw(username)
     args['content'] =content
     args['forums'] =forums
+    args['request'] = request
 
 
 
 
-    return render_to_response('index.html',args,context_instance=RequestContext(request))
+    return render_to_response('index.html',args)

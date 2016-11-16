@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -63,7 +64,7 @@ INSTALLED_APPS = [
     'threadedcomments',
     'django_comments',
     'community',
-    "django_hstore",
+
     'multiupload',
     'pytils',
     'marketplace',
@@ -136,7 +137,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.core.context_processors.request',
+                # 'django.core.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -224,6 +225,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 STATICFILES_DIRS = (
@@ -236,6 +238,7 @@ STATICFILES_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
+
 THUMBNAIL_DEBUG = True
 THUMBNAIL_FORCE_OVERWRITE = True
 

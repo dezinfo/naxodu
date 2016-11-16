@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load mathfilters %}
+
+{% block content %}
+
+    {{ object.product.name }}
+
+    <div id="bet" xmlns="http://www.w3.org/1999/html"> {{ object.current_price }} </div>
+
+
+    <div id ='mess' style="color: red"> </div>
+    {% csrf_token %}
+    <form id = "set_bet_form" action="{% url 'set_bet' %}" method="post">
+
+    <input id="inn" type="number" min="{{ object.current_price|add:object.min_price_step }}" {% if object.end_price %} max="{{  object.end_price }}" {% endif %} value="{{ object.current_price|add:object.min_price_step }}"> </input>
+    <input id ="auct_id" type="hidden" value="{{ object.pk }}"> </input>
+    <input id ="user_id" type="hidden" value="{{ request.user.id}}"> </input>
+    <button type="submit"> Сделать ставку </button>
+
+    </form>
+{##}
+{#    <script>#}
+{##}
+{##}
+{#        $('#set_bet_form').submit(function(){#}
+{##}
+{#            console.log("Submit form");#}
+{##}
+{#            $.ajax({ // create an AJAX call...#}
+{#                data: $(this).serialize(), // get the form data#}
+{#                type: $(this).attr('method'), // GET or POST#}
+{#                url: $(this).attr('action'), // the file to call#}
+{#                success: function(response) { // on success..#}
+{#                    $('#mess').html(response); // update the DIV#}
+{#                }#}
+{#            });#}
+{#            return false;#}
+{#        });#}
+{##}
+{##}
+{#    </script>#}
+
+{% endblock %}

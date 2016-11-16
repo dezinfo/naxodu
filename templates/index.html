@@ -34,33 +34,35 @@
                 <div class="row">
 
                     <div class="content">
-                        <div class="slider">
+{#                        <div class="slider">#}
+{##}
+{#                            {% if content %}#}
+{##}
+{##}
+{#                                {% for i in content|slice:'24' %}#}
+{#                                    <div class="slide">#}
+{##}
+{#                                        {% thumbnail i.get_image "x100" crop="top" as im %}#}
+{##}
+{#                                    <div class="slide-div">#}
+{#                                            <a href="{% url 'advdetail' i.pk %}">#}
+{#                                     <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" class="listing-image" style="display: inline">#}
+{##}
+{#                                    {% endthumbnail %}#}
+{##}
+{#                                        <p>{{ i.name|truncatechars:19 }}</p>#}
+{#                                    </a>#}
+{##}
+{#                                    </div>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{##}
+{#                            {% endif %}#}
+{##}
+{##}
+{#                        </div>#}
 
-                            {% if content %}
 
-
-                                {% for i in content|slice:'24' %}
-                                    <div class="slide">
-
-                                        {% thumbnail i.get_image "x100" crop="top" as im %}
-
-                                    <div class="slide-div">
-                                            <a href="{% url 'advdetail' i.pk %}">
-                                     <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" class="listing-image" style="display: inline">
-
-                                    {% endthumbnail %}
-
-                                        <p>{{ i.name|truncatechars:19 }}</p>
-                                    </a>
-
-                                    </div>
-                                    </div>
-                                {% endfor %}
-
-                            {% endif %}
-
-
-                        </div>
                     </div>
 
 

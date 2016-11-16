@@ -6,14 +6,14 @@ from django.contrib.auth.models import User
 from time import  time
 
 from smart_selects.db_fields import ChainedForeignKey
-from django_hstore import hstore
+
 from django.conf import  settings
 from PIL import Image
 from pytils.translit import slugify
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 from tinymce.models import HTMLField
-
+from django.contrib import admin
 from ckeditor.fields import RichTextField
 from userprofile.models import States,Cities
 
@@ -23,6 +23,7 @@ from userprofile.models import States,Cities
 
 CONDITION = (('New','Новый'),('Old','Б/У'))
 CURR = (('UAH','Гривна'),('USD','Доллар'),('EUR','Евро'))
+VALUE_TYPE = (('choice','Справочник'),('text','Текст'), ('number','Число'))
 
 class GoodsManager(models.Manager):
 
@@ -44,10 +45,13 @@ class CurrencyRate(models.Model):
 class Attribute(models.Model):
     name = models.CharField(max_length=30)
     verbos_name = models.CharField(max_length=50)
-
-
+    ordering = models.PositiveIntegerField(verbose_name="Сортировка", blank=True, null=True)
+    type = models.CharField(verbose_name="Тип поля",choices=VALUE_TYPE, max_length=15,default='text')
+    required = models.BooleanField(default=False)
+    filtering = models.BooleanField(default=False)
     def __str__(self):              # __unicode__ on Python 2
        return str(self.name)
+
 
 
 class AttributeValue(models.Model):
@@ -59,6 +63,15 @@ class AttributeValue(models.Model):
        return str(self.vallue)
 
 
+
+class AttributeValueOptions(admin.ModelAdmin):
+    # define the raw_id_fields
+    raw_id_fields = ('attribute')
+    # define the related_lookup_fields
+    related_lookup_fields = {
+        'fk': ['attribute'],
+
+    }
 
 
 class Category(models.Model):
@@ -190,18 +203,18 @@ class Goods(models.Model):
 
 
     name = models.CharField(verbose_name='Заголовок',max_length=250)
-    price = models.IntegerField(verbose_name='Цена', null=False,blank=False)
+    price = models.PositiveIntegerField(verbose_name='Цена', null=False,blank=False)
     description = RichTextField(verbose_name='Описание', null=False,blank=False,config_name='good_ckeditor')
     creation_date = models.DateTimeField(verbose_name='date published',auto_now_add=True)
     update_date = models.DateTimeField(verbose_name='date_update',auto_now=True)
     user = models.ForeignKey(User,max_length=100,verbose_name='Пользователь', null=True)
-    views = models.IntegerField(verbose_name='Просмотров',default=0)
+    views = models.PositiveIntegerField(verbose_name='Просмотров',default=0)
     is_salles = models.BooleanField(verbose_name='Распродажа', default=False)
-    salles_price = models.IntegerField(verbose_name='Цена распродажи',blank=True,default=0)
-    condition = models.CharField(verbose_name='Состояние',choices=CONDITION,max_length=15,blank=False)
+    salles_price = models.PositiveIntegerField(verbose_name='Цена распродажи',blank=True,default=0)
+    # condition = models.CharField(verbose_name='Состояние',choices=CONDITION,max_length=15,blank=False)
     is_active = models.BooleanField(verbose_name='Доступно', default=True)
     # is_aukc = models.BooleanField(verbose_name='На аукционе', default=False)
-    rate = models.IntegerField(verbose_name='Рейтинг',default=0,max_length=1)
+    rate = models.PositiveIntegerField(verbose_name='Рейтинг',default=0,max_length=1)
     state = models.ForeignKey(States,verbose_name='Область',null=True,blank=True)
     city = models.ForeignKey(Cities,verbose_name='Город',null=True,blank=True)
     currency = models.CharField(choices=CURR, default='UAH', max_length=3)
@@ -339,13 +352,19 @@ class AttributeMap(models.Model):
       chained_field="attribute_name",
       chained_model_field="attribute",
       show_all=False,
-      auto_choose=True, verbose_name='Значение аттрибута',blank=True)
+      auto_choose=False, verbose_name='Значение аттрибута',blank=True, null=True)
+      attribute_value_manual = models.CharField(max_length=150, blank=True)
 
 
+      def value(self):
+          if self.attribute_value is None:
 
+              return self.attribute_value_manual
+          else:
+            return self.attribute_value
 
       def __str__(self):              # __unicode__ on Python 2
-        return str(self.product_name.name+' '+self.attribute_name.name+' '+ self.attribute_value.vallue)
+        return str(self.product_name.name+' '+self.attribute_name.name+' '+str(self.value()))
 
 
 
@@ -356,7 +375,6 @@ class CatType(models.Model):
 
     def __str__(self):              # __unicode__ on Python 2
        return str(self.name)
-
 
 
 

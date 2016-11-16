@@ -44,5 +44,18 @@
 </div>
 </div>
 </div>
+<script>
 
+
+$("#id_subcategory").change(function(){
+
+    id = $("#id_subcategory").val();
+    $(".formdiv").remove();
+    get_attr_form(id);
+
+
+
+});
+
+</script>
 {% endblock %}

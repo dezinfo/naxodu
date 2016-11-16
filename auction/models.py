@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.utils import timezone
 
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -20,9 +21,9 @@ class Bets(models.Model):
 class Auction(models.Model):
     product = models.ForeignKey(Goods)
     description = RichTextUploadingField(verbose_name='Описание')
-    start_price = models.IntegerField(verbose_name='Начальная цена')
-    end_price = models.IntegerField(verbose_name='Экспресс цена')
-    min_price_step = models.IntegerField(verbose_name='Минимальный шаг цены')
+    start_price = models.PositiveIntegerField(verbose_name='Начальная цена')
+    end_price = models.PositiveIntegerField(verbose_name='Экспресс цена',blank=True,null=True )
+    min_price_step = models.PositiveIntegerField(verbose_name='Минимальный шаг цены')
     start_date = models.DateTimeField(verbose_name='Дата начала')
     end_date = models.DateTimeField(verbose_name='Дата завершения')
     creation_date = models.DateTimeField(verbose_name='date published',auto_now_add=True)
@@ -84,4 +85,5 @@ class Auction(models.Model):
 
 
 
-
+    def get_absolute_url(self):
+        return  reverse('auction', kwargs={'auct_id': self.pk})

@@ -1,0 +1,15 @@
+
+
+{% for foo in sub_list %}
+
+
+
+{% if  foo.count_products > 0 %}
+
+
+
+    <a href="{{ foo.get_absolute_url }}">{{ foo.name }}[{{ foo.count_products }}]</a>
+
+{% endif %}
+
+{% endfor %}

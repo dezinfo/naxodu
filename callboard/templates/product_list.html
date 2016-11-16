@@ -4,7 +4,7 @@
 {% load cut_time %}
 {% load comment_last %}
 {% load el_pagination_tags %}
-{% load bootstrap3 %}
+
 
 <div class="container-fluid main-adv">
     {% if content %}
@@ -12,7 +12,7 @@
         {% paginate 16 content %}
 
         {% for i in content %}
-            {% if not i.is_aukc %}
+{#            {% if not i.is_aukc %}#}
             <div class="advertisement">
                 <div class="listing-wrapper">
                     {% thumbnail i.get_image "x200" crop="top" as im %}
@@ -95,7 +95,7 @@
 
             </div>
 
-        {% endif %}
+{#        {% endif %}#}
         {% endfor %}
         <div>
          <div style="clear:both;"></div>

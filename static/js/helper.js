@@ -25,26 +25,47 @@ function getCookie(name) {
 
 $(document).ready(function(){
 
-    var options = {autoplay: true,slidesToShow: 6,
-                    slidesToScroll: 1,dots: true,speed: 600}
+    var frm = $('#set_bet_form');
 
-    $('.slider').slick(options);
+frm.submit(function(){
 
+            console.log("Submit form");
 
-    $("#nav-menu li").click(function() {
-        $("#nav-menu li").removeClass("active"); //Удаление любого "active" класса
-        $(this).addClass("active"); //Добавление "active" класса на категорию
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            //data:  frm.serialize(), /// doesn't work
+
+            data:{
+                'bet': $('#inn').val(),
+                'auct_id': $('#auct_id').val(),
+                'user_id': $('#user_id').val(),
+
+                'csrfmiddlewaretoken':getCookie('csrftoken') }, //work
+            success: function (data) {
+
+                if (data['error']) {
+                    $("#mess").html(data['error']);
+
+                    }
+                else {
+
+                    console.log(data['min_bet']);
+                    $("#mess").html(data['bet']);
+                    $("#inn").val(data['min_bet']);
+                    $("#inn").attr('min',data['min_bet']);
+
+                }
+
+            },
+            error: function(data) {
+                $("#mess").html("Something went wrong!");
+            }
         });
-
-    $('#nav-menu a').each(function () {
-        console.log(this.pathname)
-        console.log(location.pathname)
-    if (this.pathname == location.pathname) $(this).parent().addClass('active');
-    }
+        return false;
 
 
-    );
-
+});
 
 
     //$('#form-comment').on('submit', function(event){
@@ -81,21 +102,78 @@ $(document).ready(function(){
 //    });
 //};
 
-$('.category').click(function(){
+$("#nav-menu li").click(function() {
+        $("#nav-menu li").removeClass("active"); //Удаление любого "active" класса
+        $(this).addClass("active"); //Добавление "active" класса на категорию
+        });
 
-        console.log('Нажал');
+    $('#nav-menu a').each(function () {
+        //console.log(this.pathname)
+        //console.log(location.pathname)
+    if (this.pathname == location.pathname) $(this).parent().addClass('active');
+    }
+
+
+    );
 
 
 });
 
 
-});
+
+function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 
 
+function get_attr_form(subcategory_id)
+{
+        $.ajax({
+            url: "/callboard/get_attribute_form/" + subcategory_id+ "/yes/",
+            type: "GET",
+            //data: {subcategory_id: subcategory_id},
+            success: function(response) {
+
+              // response is form in html format
+
+              div = '<div class="formdiv"></div>';
+              console.log(response)
+              $("#id_name").after(div);
+              $(".formdiv").html(response);
+
+            }
+        })
+  }
 
 
 
+function get_subcat_list(category_id)
+{
+        $.ajax({
+            url: "/callboard/get_subcategory_list/" + category_id,
+            type: "GET",
+            //data: {subcategory_id: subcategory_id},
+            success: function(data) {
+
+              // response is form in html format
+
+
+              console.log(data);
+
+              $(".subcatdiv").html(data);
+
+            }
+        })
+}
 
 
 $(function () {

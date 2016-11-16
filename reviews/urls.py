@@ -1,7 +1,8 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
+from reviews import views
 
-urlpatterns = patterns('reviews',
-		url(r'^$', 'views.reviews', name='reviews'),
+urlpatterns = (
+		url(r'^$', views.reviews, name='reviews'),
 
 
-		)
+			   )

@@ -29,7 +29,7 @@ class UserProfileTable(models.Model):
     first_name = models.CharField(max_length=20,verbose_name='Имя',blank=True,null=True)
     last_name = models.CharField(max_length=40,verbose_name='Фамилия',blank=True,null=True)
     favorites = models.ManyToManyField(User, related_name='favorited_by_user',blank=True)
-    user_image = models.ImageField(verbose_name='Аватар',blank=True,default=settings.STATIC_URL+'images/avatar.jpeg')
+    user_image = models.ImageField(verbose_name='Аватар',blank=True,default=settings.STATIC_URL+'avatar.jpeg')
     adress_state = models.ForeignKey(States,verbose_name='Область',blank=True,null=True,)
     adress_city =  ChainedForeignKey(
         Cities,

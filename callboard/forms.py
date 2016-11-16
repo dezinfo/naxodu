@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from  django.forms import ChoiceField
 from multiupload.fields import MultiFileField
-from callboard.models import Goods, GoodsImageGallery,Category,SubCategory,AttributeValue
+from callboard.models import Goods, GoodsImageGallery,Category,SubCategory,AttributeValue, AttributeMap
 from PIL import Image
 from haystack.forms import SearchForm
 from tinymce.widgets import TinyMCE
@@ -18,7 +18,7 @@ class AdverForm(forms.ModelForm):
 
     class Meta:
      model = Goods
-     fields = ('category','subcategory','name','description','condition','price')
+     fields = ('category','subcategory','name','description','price')
      # exclude = ['user','is_active','creation_date','is_sell']
 
 
@@ -31,6 +31,11 @@ class AdverForm(forms.ModelForm):
         for each in self.cleaned_data['files']:
             GoodsImageGallery.objects.create(file=each, good=instance, user = instance.user)
 
+
+
+
+
+
         return instance
 
 
@@ -38,23 +43,51 @@ class AddAttrForm(forms.Form):
 
 
 
-    q = forms.CharField(label='Поиск',required=False)
+
+
 
     def __init__(self, *args, **kwargs):
 
         subcategory = kwargs.pop('sub_category')
+        creation_flag = kwargs.pop('it_creation')
+
+
+
         super(AddAttrForm, self).__init__(*args, **kwargs)
 
+        if  creation_flag!='yes':
+             self.fields['q']  = forms.CharField(label='Поиск',required=False)
 
 
-        for i in subcategory.attributes.all():
+        list = subcategory.attributes.all().order_by('ordering')
 
-            self.fields[i] = forms.ModelChoiceField(
+        print(list)
+        for i in list:
+            if i.type == 'choice':
+
+                self.fields[i] = forms.ModelChoiceField(
                             label=i.verbos_name,
-                            queryset=AttributeValue.objects.filter(attribute=i),
-                            widget=forms.Select,
-                            required=False)
 
+                            queryset=AttributeValue.objects.filter(attribute=i),
+                            widget=forms.Select(attrs={'class': i}),
+                            required=i.required
+
+                            )
+            elif i.type == 'text':
+
+
+                self.fields[i] = forms.CharField(
+                            label=i.verbos_name,
+                            required=i.required,
+                            widget=forms.TextInput(attrs={'class': i})
+                            )
+
+            else:
+                self.fields[i] = forms.IntegerField(
+                            label=i.verbos_name,
+                            required=i.required,
+                            widget=forms.NumberInput(attrs={'class': i, 'min':"0"})
+                            )
 
 class GoodsSearchForm(SearchForm):
 

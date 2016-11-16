@@ -67,9 +67,11 @@ def pruduct_list(request,user_name):
             args['market'] = market = Goods.objects.filter(user__username=user_name)
 
         args['username'] = user_name
+        args['request'] = request
+
         # args['uw'] = getuw(user_name)
 
-        return render_to_response('marketplace.html', args, context_instance=RequestContext(request))
+        return render_to_response('marketplace.html', args)
     else:
         return HttpResponseRedirect('/')
 
@@ -90,8 +92,9 @@ def order_list(request, user_name):
             args['market'] = market = Goods.objects.filter(user__username=user_name)
 
         args['username'] = user_name
+        args['request'] = request
         # args['uw'] = getuw(user_name)
 
-        return render_to_response('marketplace.html', args, context_instance=RequestContext(request))
+        return render_to_response('marketplace.html', args)
     else:
         return HttpResponseRedirect('/')

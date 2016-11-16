@@ -15,16 +15,17 @@ def createforum (request):
      form = CreateForum(request.POST, request.FILES)
      url = request.POST.get('next','/')
      args['form'] = CreateForum(request.POST, request.FILES)
+     args['request'] = request
      if request.method == 'POST':
         if form.is_valid():
             form.instance.username = request.user
             form.instance.official_status = False
             form.save()
 
-            return redirect(url, {'username': request.user.username})
+            return redirect(url, {'username': request.user.username}, args)
 
 
-     return  render(request,'createforum.html', args,context_instance=RequestContext(request))
+     return  render(request,'createforum.html', args)
 
 @login_required
 def newArticle(request,forum_id):
@@ -32,6 +33,7 @@ def newArticle(request,forum_id):
     args={}
 
     args['forum_id'] = forum_id
+    args['request'] = request
     forum =get_object_or_404(Forums,slug=forum_id)
 
     if (forum==forum_id) is not None:
@@ -53,9 +55,9 @@ def newArticle(request,forum_id):
         # args['uw'] = uw
         args['form'] = form
         args['next'] = url
+        args['request'] = request
 
-
-        return  render(request,'newarticle.html', args,context_instance=RequestContext(request))
+        return  render(request,'newarticle.html', args)
 
     else:
 
@@ -84,8 +86,8 @@ def getArticle(request, article_id):
             article.save()
 
     args['article']=article
-    return render_to_response('article.html',
-                              args,context_instance=RequestContext(request))
+    args['request'] = request
+    return render_to_response('article.html',args)
 
 
 def getForum(request,forum_name):
@@ -102,13 +104,14 @@ def getForum(request,forum_name):
     args['forum_id'] = forum_name
     args['forum_list'] = forum_list
     args['forum'] = forum
-
-    return render_to_response('forum.html',args,context_instance=RequestContext(request))
+    args['request'] = request
+    return render_to_response('forum.html',args)
 
 
 def forums(request):
     args = {}
     args['username'] = request.user.username
+    args['request'] = request
     # args['uw'] = getuw(args.get('username'))
     args['off_forums'] = Forums.objects.filter(official_status=True)
     args['user_forums'] = Forums.objects.filter(official_status=False)
@@ -119,4 +122,4 @@ def forums(request):
     Articles.objects.annotate(max_date=Max('creation_date')).filter(creation_date=F('max_date'))
 
     return render_to_response('forums.html',
-                              args,context_instance=RequestContext(request))
+                              args)

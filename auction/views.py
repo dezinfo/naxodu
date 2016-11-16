@@ -1,11 +1,14 @@
 import django_filters
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import simplejson as json
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.core.exceptions import ImproperlyConfigured
 # Create your views here.
-from django.template import RequestContext
+from django.template.context_processors import request, csrf
+
 from django.utils import timezone
 from django.views.generic import ListView
 from django_filters import FilterSet
@@ -14,6 +17,26 @@ from django.contrib import  auth
 
 from auction.models import Auction
 from auction.forms import AuctionFilterForm
+
+
+
+def get_auction(request, auct_id):
+    template = 'auct_detail.html'
+    a = get_object_or_404(Auction, pk=auct_id)
+    args = {}
+    if a.is_canceled != True:
+
+        args['object'] = a
+        args['request'] = request
+        args.update(csrf(request))
+
+        return render_to_response('auct_detail.html',args)
+    else:
+
+        args['request'] = request
+
+        return redirect('auction_list')
+
 
 
 class AuctionFilter(FilterSet):
@@ -104,15 +127,42 @@ class AuctionListView(FilterMixin,ListView):
 #
 #     return render_to_response('auctions.html',args,context_instance=RequestContext(request))
 
-
+@login_required
 def giveendprice(request,auct_id,user_id):
 
     auct = get_object_or_404(Auction,pk=auct_id)
     user = get_object_or_404(User,id=user_id)
-
+    args = {}
+    args['request'] = request
 
     bet = auct.end_price - auct.start_price
     auct.winner_bet.get_or_create(auction=auct.pk,user = user, bet=bet)
 
-    return redirect('get_aucton_list',context_instance=RequestContext(request))
+    return redirect('get_aucton_list',args)
 
+@login_required
+def set_bet(request):
+
+
+    if request.method == "POST" and request.is_ajax:
+        args = {}
+        if request.user.id == int(request.POST['user_id']):
+
+            print(request.POST)
+            bet = request.POST['bet']
+            auct_id = request.POST['auct_id']
+
+            auct = get_object_or_404(Auction,pk=auct_id)
+            user = request.user
+            auct.winner_bet.get_or_create(auction=auct.pk,user = user, bet=bet)
+            auct.save()
+            args['bet'] = bet
+            args['min_bet'] = auct.current_price()+auct.min_price_step
+            print(args)
+            return JsonResponse(args)
+        else:
+            args['error'] = 'Параметр транзакции не соответствует пользователю запроса'
+            return JsonResponse(args)
+    else:
+
+        return HttpResponse(2)

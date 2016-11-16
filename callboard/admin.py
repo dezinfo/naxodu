@@ -14,6 +14,8 @@ class CategoryAdmin(admin.ModelAdmin):
   model = Category
   list_display = ['admin_name',]
 
+
+
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(SubCategory,SubCategoryAdmin)
 admin.site.register(Goods)
@@ -25,6 +27,8 @@ admin.site.register(CurrencyRate)
 admin.site.register(Attribute)
 admin.site.register(AttributeValue)
 admin.site.register(AttributeMap)
+
+
 
 
 

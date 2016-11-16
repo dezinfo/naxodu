@@ -15,18 +15,21 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
-from django.utils import duration
+
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 from django.conf import settings
+from .views import index
+from callboard import views as callboard_views
 
 
 
 urlpatterns = [
     url(r'^secret/', include(admin.site.urls)),
+    url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
     url(r'^chaining/', include('smart_selects.urls')),
-    url(r'^$', 'sxodu.views.index'),
+    url(r'^$', index, name = 'index'),
     url(r'^callboard/', include('callboard.urls')),
     url(r'^community/', include('community.urls')),
     url(r'^reference/', include('reference.urls')),
@@ -39,12 +42,12 @@ urlpatterns = [
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 
     url(r'^search/', include('haystack.urls')),
-    url(r'^autocomplete/', 'callboard.views.autocomplete', name='autocomplete'),
+    url(r'^autocomplete/', callboard_views.autocomplete, name='autocomplete'),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^messages/', include('postman.urls', namespace='postman', app_name='postman'),name='messages'),
 
 ]
 
-
-urlpatterns += staticfiles_urlpatterns()
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG == True:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

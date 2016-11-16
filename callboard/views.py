@@ -6,15 +6,17 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render,redirect, get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.template.response import TemplateResponse
 from haystack.query import SearchQuerySet
 from django_filters import FilterSet
 
 from django.core.paginator import Paginator
-from callboard.models import Category, Goods, SubCategory
+from callboard.models import Category, Goods, SubCategory, AttributeMap, AttributeValue
 from callboard.forms import AdverForm, GoodsImageGallery, ProductFilterForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
-from sxodu.views import getuw
+
 from .forms import GoodsSearchForm
 from .forms import AddAttrForm
 
@@ -41,15 +43,20 @@ def advdetail(request,pk):
             good.save()
             args['adv'] = good
             args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
+            args['request'] = request
                 # GoodsImageGallery.objects.filter(good=pk)
 
-            return  render_to_response('advdetail.html', args,context_instance=RequestContext(request))
+            return  render_to_response('advdetail.html', args)
     good = get_object_or_404(Goods,pk=pk)
-    im = good.goodsimagegallery_set.all()
+
 
     args['adv'] = good
     args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
-    return  render_to_response('advdetail.html', args,context_instance=RequestContext(request))
+    args['attribute'] = good.attributemap_set.all().order_by('attribute_name_id__ordering')
+    args['request'] = request
+    args['user_products'] = Goods.objects.filter(user=good.user).order_by('creation_date').exclude(id=good.pk)[:8]
+
+    return  render_to_response('advdetail.html', args)
 
 
 
@@ -66,8 +73,8 @@ def editadvert(request,adv_id):
         args['username'] = request.user.username
         # args['uw'] = uw
         args['object'] = obj
-
-        return  render(request,'editadvert.html', args,context_instance=RequestContext(request))
+        args['request'] = request
+        return  render(request,'editadvert.html',args)
 
     else:
 
@@ -87,19 +94,31 @@ def createadv(request):
 
      if form.is_valid():
          form.instance.user = request.user
+
+
          form.save()
+
+         for attr in form.cleaned_data['subcategory'].attributes.all():
+            if request.POST.get(attr.name):
+                if attr.type =='choice':
+                    val = AttributeValue.objects.get(pk=request.POST.get(attr.name))
+                    AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value=val)
+                else:
+                    val = request.POST.get(attr.name)
+                    AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value_manual=val)
+
+
          return redirect(url,{'username':request.user.username})
 
     args = {}
-    # args.update(csrf(request))
     args['username'] = request.user.username
     args['form'] = form
-    # args['uw'] = uw
+
     args['next'] = url
+    args['request'] = request
 
 
-
-    return  render(request,'createadv.html', args,context_instance=RequestContext(request))
+    return  render(request,'createadv.html', args)
 
 def notes(request):
     form = GoodsSearchForm(request.GET)
@@ -237,7 +256,7 @@ class ProductListView(FilterMixin,ListView):
 
 
 
-             attr_form = AddAttrForm(self.request.POST or None, sub_category=subcategory)
+             attr_form = AddAttrForm(self.request.POST or None, sub_category=subcategory, it_creation='not')
              context['attr_form'] = attr_form
 
              context['subcategory'] = subcategory
@@ -309,13 +328,41 @@ def get_subcategory(request, category_id):
     return HttpResponse(json.dumps(subcategories_dict), content_type="application/json")
 
 
-def get_attribute_form(request,subcategory_id):
+
+def get_subcategory_list(request, category_id):
+    template = 'subcategory_list.html'
+
+    sub_list = SubCategory.objects.filter(category_id=category_id)
+    args = {}
+    args['sub_list'] = sub_list
+
+    # html = render_to_string('subcategory_list.html', args)
+    # print(sub_list)
+    # print(html)
+
+    # return HttpResponse(html)
+
+    return TemplateResponse(request,template,args)
+
+
+
+def get_attribute_form(request,subcategory_id,it_creation=''):
+
+
+
+
     subcategory = SubCategory.objects.get(pk=subcategory_id)
 
-    form = AddAttrForm(request.POST or None, sub_category=subcategory)
+    form = AddAttrForm(sub_category=subcategory,it_creation=it_creation)
 
+    args ={}
+    args['form'] = form
+    print(form)
+    if form:
+        return TemplateResponse(request,'attr_form.html',args)
+    else:
+        return  HttpResponse('pass')
 
-    return HttpResponse(form)
 
 
 

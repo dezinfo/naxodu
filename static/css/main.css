@@ -1001,7 +1001,7 @@ footer {
 
 .comments-container .comments-wrapper{
 
-    max-width: 650px;
+    max-width: 100%;
     margin: auto;
 }
 
@@ -1077,7 +1077,7 @@ footer {
 
 
 #id_name{
-    width: 152px;
+    width: 400px;
 }
 
 #id_condition {
@@ -1586,3 +1586,61 @@ h2 {
     float: left;
 }
 
+/*форма дополнительных параметров*/
+
+.MarkaMoto {
+
+    width: 120px;
+}
+
+.ModelMoto {
+
+    width: 120px;
+}
+
+.Condition {
+
+    width: 120px;
+
+}.CreatYear {
+
+    width: 120px;
+}
+
+
+.MotoType {
+
+    width: 120px;
+}
+
+.probeg {
+
+    width: 120px;
+}
+
+.Color {
+
+    width: 120px;
+}
+
+
+
+
+.formdiv {
+
+    padding-top: 15px;
+}
+
+/*форма дополнительных параметров*/
+
+
+.small-product {
+
+    width: 140px;
+    height: 200px;
+    float: left;
+    border: solid 1px black;
+    margin-left: 15px;
+    margin-bottom: 15px;
+
+}

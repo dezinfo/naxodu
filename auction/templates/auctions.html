@@ -32,7 +32,7 @@
                             </td>
                             <td>
 
-                                <a href="{% url 'advdetail' foo.product.pk %}"> {{ foo.product.name }}</a>
+                                <a href="{{ foo.get_absolute_url }}"> {{ foo.product.name }}</a>
                             </td>
 
                             <td class="td-center">{{ foo.current_price }}</td>

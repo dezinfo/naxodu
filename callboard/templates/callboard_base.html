@@ -1,7 +1,7 @@
   <div class="col-md-10" style="padding-left: 150px">
 
 
-
+            <div class="category-trigger">
             {% for cat in cat_list %}
 
                 <div class="category-container">
@@ -11,52 +11,26 @@
                  <div class="category btn btn-primary" id = "{{ cat.pk }}">
 
 
-                 {{ cat.name }} {% if cat.count_products > 0 %} [{{ cat.count_products }}] {% endif %}
-
-
-
-
-
+                 {{ cat.name}} {% if cat.count_products > 0 %} [{{ cat.count_products }}] {% endif %}
 
 
                 </div> </a>
+                </div>
 
-                <ul class="dropdown-menu" aria-labelledby="{{ cat.pk }}">
-
-
-                                  {% for subcat in subcat_list %}
-
-                                    {% if subcat.category.name == cat.name %}
-
-                                    <li><a href="{{ subcat.get_absolute_url }}">{{ subcat.name }} {% if subcat.count_products > 0 %} [{{ subcat.count_products }}]{% endif %}</a></li>
-
-                                   {% endif %}
-
-                                {% endfor %}
-
-                             </ul>
-                    </div>
-{#                      <div class="category dropdown">#}
-{#                      <a href="#"id="{{ cat.pk }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">#}
-{#                          <span class="caret"></span></a> Подкатегория#}
-
-
-
-
-
-
-{#                       </div>#}
             </div>
 
            {% endfor %}
+            </div>
             <div class="cl"></div>
-            <div>{% if category %} <h4> Категория <strong>[{{ category.name}}]</strong>  <a href="{% url 'callboard' %}"> oчистить  </a>
+            <div>{% if category %} <h4 class = 'show_subcat' id="{{ category.pk }}"> Категория <strong>[{{ category.name}}]</strong>  <a href="{% url 'callboard' %}"> oчистить  </a>
             {% if subcategory %}
                  >> Подкатегория <strong>[{{ subcategory.name}}]</strong>  <a href="{{ category.get_absolute_url }}"> oчистить  </a>  </h4>
             {% endif%} {% endif %}
 
-            {% if attr_form %}
 
+            <div class="subcatdiv"> </div>
+
+            {% if attr_form %}
 
 
             <form method="GET" action="{% url 'subcategory' category.slug subcategory.slug %}">
@@ -74,3 +48,32 @@
             </div>
 
         </div>
+<script>
+
+MarkaMoto = getParameterByName('MarkaMoto');
+ModelMoto = getParameterByName('ModelMoto');
+Condition = getParameterByName('Condition');
+CreatYear = getParameterByName('CreatYear');
+Color = getParameterByName('Color');
+
+
+$("#id_MarkaMoto").val(MarkaMoto);
+$("#id_ModelMoto").val(ModelMoto);
+$("#id_CreatYear").val(CreatYear);
+$("#id_Condition").val(Condition);
+$("#id_Color").val(Color);
+
+
+
+
+
+ if ($('.show_subcat').text() != '') {
+
+     category_id = $(".show_subcat").attr('id');
+     $('.category-trigger').hide();
+     get_subcat_list(category_id);
+
+
+ }
+
+</script>

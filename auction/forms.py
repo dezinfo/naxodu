@@ -9,7 +9,8 @@ from django import forms
 
 
 class AuctionFilterForm(forms.Form):
-    name = forms.CharField(label='Поиск',required=False)
+    name = forms.CharField(label='Поиск',required=False, widget=forms.TextInput(attrs={'id':'auct_search'}))
+
     category = forms.ModelChoiceField(
         label='Категория',
         queryset=Category.objects.all(),

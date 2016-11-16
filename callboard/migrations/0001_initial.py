@@ -6,7 +6,7 @@ import callboard.models
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_hstore.fields
+
 import smart_selects.db_fields
 
 
@@ -50,7 +50,6 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, verbose_name='Описание')),
                 ('creation_date', models.DateTimeField(auto_now_add=True, verbose_name='date published')),
                 ('update_date', models.DateTimeField(auto_now=True, verbose_name='date_update')),
-                ('data', django_hstore.fields.DictionaryField(blank=True, verbose_name='Data')),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='callboard.Category', verbose_name='Карегория')),
             ],
             options={

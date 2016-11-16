@@ -9,7 +9,7 @@
 
     <div class="col-md-3">
          <div class="search-auct">
-        <form method="GET" action="{% url 'auction' %}">
+        <form method="GET" action="{% url 'auction_list' %}">
 
         {{ filter_form.as_p }}
     <input type="hidden" name="q" value = {{ request.GET.q }}>
@@ -21,7 +21,7 @@
              </div>
     </form>
     <div style="text-align: right; margin-right: 30px; font-size: 12px">
-             <a href='{% url 'auction' %}' style="align: right">Очистить фильтр</a>
+             <a href='{% url 'auction_list' %}' style="align: right">Очистить фильтр</a>
     </div>
     </div>
     </div>

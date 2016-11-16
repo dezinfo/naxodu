@@ -145,16 +145,30 @@
 
 
                                                 <div class="hidden-xs">
-                                                    <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
+                                                    <a href="#"
                                                        class="btn btn-orange text-center text-medium buy-now-btn"
                                                        attr-marketplace="{{ adv.category }}">Купить</a>
 
                                                 </div>
 
 
-                                                <p class="text-right comments-anchor">
-                                                    <a href="#listing-comments-desktop">0 Comments</a>
-                                                </p>
+                                                <div class="attributes">
+
+                                                   {% for foo in attribute %}
+                                                            {{ foo.attribute_name.verbos_name }} :
+                                                            {{ foo.value}}
+
+                                                    <br>
+                                                   {% endfor %}
+
+{#                                                        Состояние : {% if adv.condition  == 'New' %}#}
+{#                                                        Новое {% else %} Б\у {%endif %}#}
+
+
+
+                                                </div>
+
+
                                             </div>
 
 
@@ -213,6 +227,9 @@
                                                     <div>
 
                                                         <a href="#" class="leave-comment-link">Все объявления</a></div>
+
+                                                    {% include 'other_user_products.html'  %}
+
                                                     <div class="comment-list"></div>
                                                 </div>
                                             </div>
@@ -279,7 +296,7 @@
                                                         <i class="icon-star filled"></i>
                                                         <i class="icon-star"></i>
                                                         <i class="icon-star"></i>
-                                                        <a href="/profile/67114/kneeslider#feedback-container"
+                                                        <a href="#"
                                                            class="feedback-count">
                                                             <span>(3)</span>
                                                         </a>
@@ -415,20 +432,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xs-12 sticky-wrapper hidden-xs" style="display: none;">
-                                        <div class="side-container sticky-container">
-                                            <p class="side-headline text-center"><strong>Kryptonite Bolt Down Lock
-                                                Anchor</strong></p>
-                                            <p class="text-center">
-                                                <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>
-                                            </p>
-                                            <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"
-                                               class="btn btn-orange text-center text-medium buy-now-btn"
-                                               attr-marketplace="BMW MOA">Buy Now</a>
-                                            <p class="text-center"><img src="/Content/images/panjo/detail/moneyBack.svg"
-                                                                        alt="Guarantee"></p>
-                                        </div>
-                                    </div>
+{#                                    <div class="col-xs-12 sticky-wrapper hidden-xs" style="display: none;">#}
+{#                                        <div class="side-container sticky-container">#}
+{#                                            <p class="side-headline text-center"><strong>Kryptonite Bolt Down Lock#}
+{#                                                Anchor</strong></p>#}
+{#                                            <p class="text-center">#}
+{#                                                <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>#}
+{#                                            </p>#}
+{#                                            <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"#}
+{#                                               class="btn btn-orange text-center text-medium buy-now-btn"#}
+{#                                               attr-marketplace="BMW MOA">Buy Now</a>#}
+{#                                            <p class="text-center"><img src="/Content/images/panjo/detail/moneyBack.svg"#}
+{#                                                                        alt="Guarantee"></p>#}
+{#                                        </div>#}
+{#                                    </div>#}
                                 </div>
                             </div>
                         </div>
