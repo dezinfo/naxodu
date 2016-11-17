@@ -77,15 +77,15 @@ haystack/templates/search_configuration/solr.xml
    <field name="django_ct" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="django_id" type="string" indexed="true" stored="true" multiValued="false"/>
 
-   <field name="is_active" type="text_en" indexed="true" stored="true" multiValued="false" />
+   <field name="text" type="text_en" indexed="true" stored="true" multiValued="false" />
 
    <field name="content_type" type="text_en" indexed="true" stored="true" multiValued="false" />
 
-   <field name="description" type="text_en" indexed="true" stored="true" multiValued="false" />
-
    <field name="auto_name" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
 
-   <field name="text" type="text_en" indexed="true" stored="true" multiValued="false" />
+   <field name="description" type="text_en" indexed="true" stored="true" multiValued="false" />
+
+   <field name="is_active" type="text_en" indexed="true" stored="true" multiValued="false" />
 
    <field name="body" type="text_en" indexed="true" stored="true" multiValued="false" />
 
@@ -593,4 +593,3 @@ haystack/templates/search_configuration/solr.xml
     <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
 
 </schema>
-

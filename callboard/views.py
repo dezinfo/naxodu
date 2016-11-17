@@ -357,7 +357,7 @@ def get_attribute_form(request,subcategory_id,it_creation=''):
 
     args ={}
     args['form'] = form
-    print(form)
+    # print(form)
     if form:
         return TemplateResponse(request,'attr_form.html',args)
     else:
