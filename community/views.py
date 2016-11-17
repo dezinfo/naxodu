@@ -87,7 +87,7 @@ def getArticle(request, article_id):
 
     args['article']=article
     args['request'] = request
-    return render_to_response('article.html',args)
+    return render(request,'article.html',args)
 
 
 def getForum(request,forum_name):
@@ -105,7 +105,7 @@ def getForum(request,forum_name):
     args['forum_list'] = forum_list
     args['forum'] = forum
     args['request'] = request
-    return render_to_response('forum.html',args)
+    return render(request,'forum.html',args)
 
 
 def forums(request):
@@ -121,5 +121,5 @@ def forums(request):
 
     Articles.objects.annotate(max_date=Max('creation_date')).filter(creation_date=F('max_date'))
 
-    return render_to_response('forums.html',
+    return render(request,'forums.html',
                               args)

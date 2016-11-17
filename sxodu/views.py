@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 
 from callboard.models import Goods
@@ -44,9 +44,12 @@ def index(request):
     # args['uw'] = getuw(username)
     args['content'] =content
     args['forums'] =forums
-    args['request'] = request
+    # args['request'] = request
+
+
+    # context.Context
 
 
 
 
-    return render_to_response('index.html',args)
+    return render(request,'index.html',context=args)

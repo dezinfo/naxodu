@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render,redirect, get_object_or_404
 from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.template import context
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from haystack.query import SearchQuerySet
