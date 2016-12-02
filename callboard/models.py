@@ -4,7 +4,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
 from time import  time
+from django.utils import timezone
 
+
+from django.db.models.functions import datetime
 from smart_selects.db_fields import ChainedForeignKey
 
 from django.conf import  settings
@@ -32,6 +35,9 @@ class GoodsManager(models.Manager):
         return self.filter(is_active=True)
 
 
+    def order_by(self):
+        return  self.order_by('-order_date')
+
 
 
 def get_upload_file_name(instance, filename):
@@ -49,6 +55,7 @@ class Attribute(models.Model):
     type = models.CharField(verbose_name="Тип поля",choices=VALUE_TYPE, max_length=15,default='text')
     required = models.BooleanField(default=False)
     filtering = models.BooleanField(default=False)
+    key_words = models.BooleanField(default=False)
     def __str__(self):              # __unicode__ on Python 2
        return str(self.name)
 
@@ -218,7 +225,7 @@ class Goods(models.Model):
     state = models.ForeignKey(States,verbose_name='Область',null=True,blank=True)
     city = models.ForeignKey(Cities,verbose_name='Город',null=True,blank=True)
     currency = models.CharField(choices=CURR, default='UAH', max_length=3)
-
+    order_date = models.DateTimeField(verbose_name='Дата для сортировки', blank=True)
 
     objects = GoodsManager()
 
@@ -244,14 +251,27 @@ class Goods(models.Model):
 
     def save(self,*args,**kwargs):
 
+
+
         try:
             self.state = self.user.userprofile_set.all().get().adress_state
             self.city = self.user.userprofile_set.all().get().adress_city
         except:
             pass
 
+        if self.order_date is None:
+           self.order_date=timezone.now()
+        else:
+            delta = timezone.now()-self.creation_date
+            if delta.days >= 30:
+                self.order_date=timezone.now()
 
         super(Goods, self).save(*args, **kwargs)
+
+
+
+
+
 
     def ua_price(self):
 

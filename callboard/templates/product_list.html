@@ -17,7 +17,17 @@
                 <div class="listing-wrapper">
                     {% thumbnail i.get_image "x200" crop="top" as im %}
                         <div class="image-wrapper">
+
+                        {% if i.is_aukc %}
+
+                           <a href="{{ i.auction_set.get.get_absolute_url}}">
+
+
+                        {% else %}
+
                         <a href="{% url 'advdetail' i.pk %}">
+
+                        {% endif %}
 
                         {% if i.is_salles %}
                             <div class="for_sale" title="Старая цена {{ i.ua_price.2}} грн. Скидка {{ i.sales_percent }}%">
@@ -44,7 +54,7 @@
                             <div class="detail-left">
                                             <span class="listing-date">
                                                 <i class="fa fa-clock-o" title="Добавлено"></i><text
-                                                    class="space">{{ i.creation_date|timesince|upto:',' }}</text>
+                                                    class="space">{{ i.order_date|timesince|upto:',' }}</text>
                                             </span>
                                             <span class="listing-views">
                                                 <i class="fa fa-eye" title="Просмотров"></i> <text
@@ -65,7 +75,8 @@
 
                                             {% if i.is_aukc %}
 
-                                                Аукцион
+                                               <a href="{{ i.auction_set.get.get_absolute_url}}"> Аукцион </a>
+
 
                                             {% else %}
                                             <sup>грн.</sup>

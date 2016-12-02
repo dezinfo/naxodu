@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import django_filters
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ from django.contrib import  auth
 
 from auction.models import Auction
 from auction.forms import AuctionFilterForm
+from callboard.models import GoodsImageGallery, AttributeMap
 
 
 
@@ -26,11 +28,22 @@ def get_auction(request, auct_id):
     args = {}
     if a.is_canceled != True:
 
+        args['fotolist'] = GoodsImageGallery.objects.filter(good = a.product)
+        args['attribute'] = AttributeMap.objects.filter(product_name=a.product)
         args['object'] = a
-        args['request'] = request
+        args['curr'] = 'грн.'
+        args['attribute'] = a.product.attributemap_set.all().order_by('attribute_name_id__ordering')
+
+        min_bet = a.current_price()+a.min_price_step
+
+        if (a.end_price and min_bet > a.end_price):
+               args['min_bet'] = a.end_price
+        else:
+                args['min_bet'] = min_bet
+
         args.update(csrf(request))
 
-        return render_to_response('auct_detail.html',args)
+        return render(request,'auct_detail.html',args)
     else:
 
         args['request'] = request
@@ -128,17 +141,23 @@ class AuctionListView(FilterMixin,ListView):
 #     return render_to_response('auctions.html',args,context_instance=RequestContext(request))
 
 @login_required
-def giveendprice(request,auct_id,user_id):
+def giveendprice(request,auct_id):
 
-    auct = get_object_or_404(Auction,pk=auct_id)
-    user = get_object_or_404(User,id=user_id)
-    args = {}
-    args['request'] = request
+   if request.method == "POST":
 
-    bet = auct.end_price - auct.start_price
-    auct.winner_bet.get_or_create(auction=auct.pk,user = user, bet=bet)
 
-    return redirect('get_aucton_list',args)
+
+        auct = get_object_or_404(Auction,pk=auct_id)
+        # user = get_object_or_404(User,use=user_id)
+        args = {}
+        args['request'] = request
+
+        bet = auct.end_price
+        auct.winner_bet.get_or_create(auction=auct.pk,user = request.user, bet=bet)
+
+        return redirect('auction_list')
+   return
+   pass
 
 @login_required
 def set_bet(request):
@@ -146,23 +165,33 @@ def set_bet(request):
 
     if request.method == "POST" and request.is_ajax:
         args = {}
-        if request.user.id == int(request.POST['user_id']):
 
-            print(request.POST)
-            bet = request.POST['bet']
-            auct_id = request.POST['auct_id']
+        # print(request.POST)
+        bet = request.POST['bet']
+        auct_id = request.POST['auct_id']
+        auct = get_object_or_404(Auction,pk=auct_id)
 
-            auct = get_object_or_404(Auction,pk=auct_id)
-            user = request.user
-            auct.winner_bet.get_or_create(auction=auct.pk,user = user, bet=bet)
-            auct.save()
-            args['bet'] = bet
-            args['min_bet'] = auct.current_price()+auct.min_price_step
-            print(args)
+        if request.user == auct.product.user:
+           args['error'] = 'Вы не можете делать ставки по своим лотам'
+           return JsonResponse(args)
+
+        min_bet = auct.current_price()+auct.min_price_step
+        if int(bet) < min_bet:
+            args['error'] = 'Ваша ставка меньше минимально допустимой = '+ str(min_bet)
             return JsonResponse(args)
+
+        auct.winner_bet.get_or_create(auction=auct.pk,user = request.user, bet=bet)
+        auct.save()
+        args['bet'] = bet
+        min_bet = auct.current_price()+auct.min_price_step
+        if (auct.end_price and min_bet > auct.end_price):
+           args['min_bet'] = auct.end_price
         else:
-            args['error'] = 'Параметр транзакции не соответствует пользователю запроса'
-            return JsonResponse(args)
+            args['min_bet'] = min_bet
+
+        print(args)
+        return JsonResponse(args)
+
     else:
 
         return HttpResponse(2)

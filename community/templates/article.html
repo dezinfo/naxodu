@@ -35,6 +35,20 @@
 {% endblock %}
 
 
+{% block social %}
+
+    <meta property="og:title" content="{{ article.name }}" />
+{#    <meta property="og:description" content= '{% autoescape off %}{{ adv.description }}{% endautoescape %}' />#}
+{#    <meta property="og:image" content='http://avtocry.com{{ adv.get_image.url }}'  />#}
+{#    <meta property="og:image:width" content='200'  />#}
+{#    <meta property="og:image:height" content='200'  />#}
+
+{#    <meta property="og:url" content="http://avtocry.com" />#}
+
+
+{% endblock %}
+
+
 {% block content %}
 <div class="container">
 

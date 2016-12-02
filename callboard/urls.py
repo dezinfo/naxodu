@@ -5,6 +5,7 @@ from callboard import views
 
 urlpatterns = (
 		url(r'^createadv/', views.createadv, name='createadv'),
+		url(r'^send_mail/', views.my_send_mail, name='send_mail'),
 		url(r'^editadvert/(?P<adv_id>\d+)/$', views.editadvert, name='editadvert'),
 		url(r'^advdetail/(?P<pk>\d+)/', views.advdetail, name='advdetail'),
 

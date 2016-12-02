@@ -1,7 +1,34 @@
+{% load thumbnail %}
+
+
+<div class="user-product-wrapper">
 {% for product in user_products %}
     <div class="small-product">
+        <div class="small-product-img">
+           {% thumbnail product.get_image "138x150" crop="top" as im %}
 
-        {{ product.name }}
+
+            <div class="product-img" style="background-image: url('{{ im.url }}');
+                    ">
+
+
+
+            </div>
+
+            {% endthumbnail%}
+        </div>
+
+        <div class="small-product-href">
+        <a href="{{ product.get_absolute_url }}">{{ product.name|truncatechars:50 }} </a>
+        </div>
+
+        <div>
+            {{ product.price }}
+
+        </div>
+
+
 
     </div>
 {% endfor %}
+</div>

@@ -23,13 +23,29 @@ function getCookie(name) {
 }
 
 
+
+
+
+
+
 $(document).ready(function(){
 
     var frm = $('#set_bet_form');
 
 frm.submit(function(){
 
-            console.log("Submit form");
+            //console.log("Submit form");
+            //console.log($("#inn").val());
+
+        if($("#inn").val() == '')
+
+                {
+
+                    alert('Ставка не может быть пустой');
+
+                    return false;
+
+                }
 
         $.ajax({
             type: frm.attr('method'),
@@ -45,7 +61,9 @@ frm.submit(function(){
             success: function (data) {
 
                 if (data['error']) {
-                    $("#mess").html(data['error']);
+                    $('#error').show()
+                    $("#error").html(data['error']);
+                    setTimeout(function(){$('#error').hide()},3000);  //30000 = 30 секунд
 
                     }
                 else {
@@ -59,7 +77,7 @@ frm.submit(function(){
 
             },
             error: function(data) {
-                $("#mess").html("Something went wrong!");
+                $("#error").html("Something went wrong!");
             }
         });
         return false;

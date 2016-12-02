@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from functools import reduce
+
 import django_filters
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
@@ -10,15 +12,15 @@ from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from haystack.query import SearchQuerySet
 from django_filters import FilterSet
-
+from sxodu import settings
 from django.core.paginator import Paginator
 from callboard.models import Category, Goods, SubCategory, AttributeMap, AttributeValue
 from callboard.forms import AdverForm, GoodsImageGallery, ProductFilterForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
-
+from django.core.mail import send_mail
 from .forms import GoodsSearchForm
-from .forms import AddAttrForm
+from .forms import AddAttrForm, EditAdvertForm, EditAttrForm, AddAttrFilterForm
 
 import simplejson as json
 
@@ -34,29 +36,53 @@ def advdetail(request,pk):
     args = {}
     # args['username'] = request.user.username
     # args['uw'] = uw
+    good = get_object_or_404(Goods,pk=pk)
     test = request.session.get('has_viewd_%s' % pk,False)
-    if request.session.get('has_viewd_%s' % pk)!=True:
+    # добавляем один просмотр за сессию... автору просмотр не засчитывается
+    if (request.session.get('has_viewd_%s' % pk)!=True and request.user != good.user):
             request.session['has_viewd_%s' % pk] = True
             # good = Goods.objects.get(pk=pk)
-            good = get_object_or_404(Goods,pk=pk)
+
             good.views = good.views+1
             good.save()
             args['adv'] = good
+            attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
             args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
+            args['attribute'] = attribute
+            args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
             args['request'] = request
-                # GoodsImageGallery.objects.filter(good=pk)
 
-            return  render_to_response('advdetail.html', args)
-    good = get_object_or_404(Goods,pk=pk)
+            try:
+                releted_products = attribute.get(attribute_name_id__key_words=True)
+                if releted_products:
+                    val = releted_products.value()
+
+                    args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
+            except:
+
+                args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
+
+            return  render(request,'advdetail.html', args)
 
 
+    attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
     args['adv'] = good
     args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
-    args['attribute'] = good.attributemap_set.all().order_by('attribute_name_id__ordering')
+    args['attribute'] = attribute
     args['request'] = request
-    args['user_products'] = Goods.objects.filter(user=good.user).order_by('creation_date').exclude(id=good.pk)[:8]
+    args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
 
-    return  render_to_response('advdetail.html', args)
+    try:
+        releted_products = attribute.get(attribute_name_id__key_words=True)
+        if releted_products:
+            val = releted_products.value()
+
+            args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
+    except:
+
+        args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
+
+    return  render(request,'advdetail.html', args)
 
 
 
@@ -66,19 +92,57 @@ def editadvert(request,adv_id):
 
     obj = get_object_or_404(Goods,pk=adv_id)
 
-    if request.user.username == str(obj.user):
+    if request.user == obj.user:
 
-        # uw=getuw(request.user.username)
-        args={}
-        args['username'] = request.user.username
-        # args['uw'] = uw
-        args['object'] = obj
-        args['request'] = request
-        return  render(request,'editadvert.html',args)
+
+        if request.method == "POST":
+            eaf = EditAdvertForm(request.POST,instance=obj)
+            # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+            eattf = EditAttrForm(request.POST,obj=obj)
+            if eaf.is_valid():
+                eaf.save()
+
+                att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+                for attr in att_map:
+                        a = request.POST.get(attr.attribute_name.name)
+                    # if request.POST.get(attr.attribute_name.name):
+                        a_val = request.POST.get(attr.attribute_name.name)
+                        if attr.attribute_name.type =='choice':
+                            if a:
+                                a_val_obj = AttributeValue.objects.get(pk=a_val)
+                            else:
+                                a_val_obj = None
+                            AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
+
+                                                                 defaults={'attribute_value': a_val_obj})
+                        else:
+
+                            AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
+
+                                                                  defaults={'attribute_value_manual': a_val})
+
+                return redirect('/')
+        else:
+            eaf = EditAdvertForm(instance=obj)
+            # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+            eattf = EditAttrForm(obj=obj)
+            # print(eattf)
+            args={}
+
+            args['object'] = obj
+            args['EditAdvertForm'] = eaf
+            args['EditAttrForm'] = eattf
+
+            return  render(request,'editadvert.html',args)
 
     else:
 
         return HttpResponseRedirect('/')
+
+def all(items):
+    import operator
+    return reduce(operator.and_, [bool(item) for item in items])
+
 
 @login_required
 def createadv(request):
@@ -156,8 +220,9 @@ class ProductFilter(FilterSet):
     name = django_filters.CharFilter(name='name', lookup_type='icontains',distinct=True)
     min_price = django_filters.NumberFilter(name='price', lookup_type='gte',distinct=True)
     max_price = django_filters.NumberFilter(name='price', lookup_type='lte',distinct=True)
-    moto_marka = django_filters.CharFilter(name='attributemap__attribute_value__vallue',lookup_type='icontains',distinct=True)
-    moto_model = django_filters.CharFilter(name='attributemap__attribute_value__vallue',lookup_type='icontains',distinct=True)
+    MarkaMoto = django_filters.CharFilter(name='attributemap__attribute_value__id',lookup_type='icontains',distinct=True)
+    ModelMoto = django_filters.CharFilter(name='attributemap__attribute_value__id',lookup_type='icontains',distinct=True)
+    CreatYear = django_filters.CharFilter(name='attributemap__attribute_value_manual',lookup_type='icontains',distinct=True)
 
     class Meta:
         model = Goods
@@ -168,14 +233,15 @@ class ProductFilter(FilterSet):
             'subcategory',
             'name',
             'description',
-            'moto_marka',
-            'moto_model'
+            'MarkaMoto',
+            'ModelMoto',
+            'CreatYear'
 
         ]
 
 
 def product_list(request):
-    qs = Goods.objects.all().order_by('-update_date')
+    qs = Goods.objects.all().order_by('-order_date')
     sort = request.GET.get("sort")
 
     if sort:
@@ -225,7 +291,7 @@ class FilterMixin(object):
 
 class ProductListView(FilterMixin,ListView):
     model = Goods
-    queryset = Goods.objects.only_active().select_related('user').order_by('-update_date')
+    queryset = Goods.objects.only_active().select_related('user').order_by('-order_date')
 
 
 
@@ -256,7 +322,7 @@ class ProductListView(FilterMixin,ListView):
 
 
 
-             attr_form = AddAttrForm(self.request.POST or None, sub_category=subcategory, it_creation='not')
+             attr_form = AddAttrFilterForm(self.request.POST or None, sub_category=subcategory)
              context['attr_form'] = attr_form
 
              context['subcategory'] = subcategory
@@ -365,7 +431,9 @@ def get_attribute_form(request,subcategory_id,it_creation=''):
 
 
 
-
+def my_send_mail():
+    print('sent')
+    send_mail('Ленусику', 'Любимому жулику.', 'loveyou@avtocry.com', ['o.korablev@gmail.com'])
 
 
 # def callboard (request):

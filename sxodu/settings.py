@@ -78,7 +78,8 @@ INSTALLED_APPS = [
     'el_pagination',
     'postman',
     'mathfilters',
-    'addthis'
+    'addthis',
+    'online_status',
 
 ]
 
@@ -114,6 +115,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'online_status.middleware.OnlineStatusMiddleware',
+    'userprofile.middleware.SetLastVisitMiddleware',
 
 ]
 
@@ -215,19 +218,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-
-
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'static'),
         'static',
     )
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
@@ -285,9 +283,21 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 ACCOUNT_PASSWORD_MIN_LENGTH = 3
+
+#########################
+# Mail Settings         #
+#########################
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_USE_TLS = False
+# DEFAULT_FROM_EMAIL = 'Whatever <whatever@example.com>'
+
 
 EL_PAGINATION_DEFAULT_CALLABLE_ARROWS = False
 EL_PAGINATION_PAGE_LIST_CALLABLE = 'el_pagination.utils.get_elastic_page_numbers'
@@ -302,3 +312,9 @@ ADDTHIS_SETTINGS = {
 
     'PUB_ID': 'ra-58203757f2df7515'
 }
+
+USERS_ONLINE__TIME_IDLE = 60*5 # 5 minutes
+USERS_ONLINE__TIME_OFFLINE = 60*10 # 10 minutes
+
+USERS_ONLINE__CACHE_PREFIX_USER = 'online_user'
+USERS_ONLINE__CACHE_USERS = 'online_users'

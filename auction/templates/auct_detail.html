@@ -1,43 +1,520 @@
 {% extends 'base.html' %}
 {% load mathfilters %}
+{% load thumbnail %}
+{% load static %}
+{% load humanize %}
+{% load mathfilters %}
+{% load addthis %}
+
+
+
+{% block title %}
+
+    Акцион {{ object.product.name }}
+
+{% endblock %}
+
+
+{% block social %}
+
+    <meta name="description" content="{{ object.product.name }} ">
+
+    <meta property="og:title" content="{{ object.product.name }}"/>
+    <meta property="og:description" content="{{ object.description|truncatechars:150 }}"/>
+    <meta property="og:image" content='http://avtocry.com{{ object.product.get_image.url }}'/>
+    <meta property="og:image:width" content='200'/>
+    <meta property="og:image:height" content='200'/>
+
+    <meta property="og:url" content="http://avtocry.com"/>
+
+
+{% endblock %}
+
 
 {% block content %}
 
-    {{ object.product.name }}
-
-    <div id="bet" xmlns="http://www.w3.org/1999/html"> {{ object.current_price }} </div>
 
 
-    <div id ='mess' style="color: red"> </div>
-    {% csrf_token %}
-    <form id = "set_bet_form" action="{% url 'set_bet' %}" method="post">
+    <main class="container-fluid listing-detail-page" id="listing-detail-page">
+        <div class="row">
+            <div class="col-xs-12">
 
-    <input id="inn" type="number" min="{{ object.current_price|add:object.min_price_step }}" {% if object.end_price %} max="{{  object.end_price }}" {% endif %} value="{{ object.current_price|add:object.min_price_step }}"> </input>
-    <input id ="auct_id" type="hidden" value="{{ object.pk }}"> </input>
-    <input id ="user_id" type="hidden" value="{{ request.user.id}}"> </input>
-    <button type="submit"> Сделать ставку </button>
+                <div class="row hidden-xs">
+                    <div class="col-xs-12 col-sm-9 breadcrumbs">
 
-    </form>
-{##}
-{#    <script>#}
-{##}
-{##}
-{#        $('#set_bet_form').submit(function(){#}
-{##}
-{#            console.log("Submit form");#}
-{##}
-{#            $.ajax({ // create an AJAX call...#}
-{#                data: $(this).serialize(), // get the form data#}
-{#                type: $(this).attr('method'), // GET or POST#}
-{#                url: $(this).attr('action'), // the file to call#}
-{#                success: function(response) { // on success..#}
-{#                    $('#mess').html(response); // update the DIV#}
-{#                }#}
-{#            });#}
-{#            return false;#}
-{#        });#}
-{##}
-{##}
-{#    </script>#}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Left Column-->
+                    <div class="col-sm-9 left-col">
+                        <!-- Left Column Top Row-->
+                        <div class="row">
+                            <div class="col-xs-12 main-col">
+                                <div class="main-details-section">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h1 class="text-medium text-center listing-title-text">
+                                                <strong>{{ object.product.name }}</strong>
+                                            </h1>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Listing Images Column -->
+                                        <div class="col-xs-12 col-md-7 images-col">
+                                            <div class="listing-images">
+                                                <!--   добавить слайдер с фото -->
+
+                                                <div id="blueimp-gallery" class="blueimp-gallery">
+                                                    <div class="slides"></div>
+                                                    <h3 class="title"></h3>
+                                                    <a class="prev">‹</a>
+                                                    <a class="next">›</a>
+                                                    <a class="close">×</a>
+                                                    <a class="play-pause"></a>
+                                                    <ol class="indicator"></ol>
+                                                </div>
+
+                                                <div id="blueimp-gallery-carousel"
+                                                     class="blueimp-gallery blueimp-gallery-carousel">
+                                                    <div class="slides"></div>
+                                                    <h3 class="title"></h3>
+                                                    <a class="prev">‹</a>
+                                                    <a class="next">›</a>
+                                                    <a class="play-pause"></a>
+                                                    <ol class="indicator"></ol>
+                                                </div>
+
+
+                                                {% if fotolist %}
+                                                    <div id="links">
+                                                        {% for foto in fotolist %}
+
+                                                            <a href="{{ foto.file.url }}" title="{{ foto.good.name }}">
+
+                                                                <img src="{{ foto.file.url }}" style="width: 50px">
+
+
+                                                            </a>
+                                                        {% endfor %}
+
+                                                    </div>
+                                                {% endif %}
+
+
+                                                <!--   добавить слайдер с фото -->
+                                            </div>
+                                        </div>
+                                        <!-- End Listing Images Column -->
+
+                                        <!-- Item Details Column -->
+                                        <div class="col-xs-12 col-sm-5 hidden-sm details-col">
+                                            <div class="listing-details-main">
+
+                                                <div class="auct-detail">
+
+                                                    <div class="auct-detail-row"> Дата
+                                                        завершения: {{ object.end_date }} </div>
+                                                    <div class="auct-detail-row"> Текущая цена: <span
+                                                            id="mess"> {{ object.current_price }} {{ curr }}</span>
+                                                    </div>
+                                                    <div class="auct-detail-row"> Минимальная
+                                                        ставка: {{ object.min_price_step }} {{ curr }} </div>
+                                                    {% if object.product.user != request.user %}
+                                                        <form id="set_bet_form" action="{% url 'set_bet' %}"
+                                                              method="post">
+                                                            {% csrf_token %}
+                                                            <div class="auct-detail-row"> Предложить цену:
+                                                                {#    <div id ='mess' style="color: red"> </div>#}
+
+
+                                                                <input id="inn" type="number" min="{{ min_bet }}"
+                                                                        {% if object.end_price %}
+                                                                       max="{{ object.end_price }}" {% endif %}
+                                                                       value="{{ min_bet }}"> </input>
+                                                                <input id="auct_id" type="hidden"
+                                                                       value="{{ object.pk }}"> </input>
+
+                                                                <button type="submit"> Ставка</button>
+
+
+                                                            </div>
+                                                        </form>
+                                                    {% endif %}
+
+
+                                                    <div class="alert-danger" id='error'></div>
+
+                                                    {% if object.end_price %}
+
+                                                        <form action="{% url 'give_end_price' object.pk %}"
+                                                              method="post">
+                                                            {% csrf_token %}
+
+                                                            Экспресс цена: {{ object.end_price }} {{ curr }}
+                                                            {% if object.product.user != request.user %}
+                                                                <button type="submit"> Купить</button>
+                                                            {% endif %}
+
+                                                        </form>
+                                                    {% endif %}
+
+                                                </div>
+
+
+                                                <div class="attributes">
+
+                                                    {% for foo in attribute %}
+                                                        {% if foo.value %}
+                                                            {{ foo.attribute_name.verbos_name }} :
+                                                            {{ foo.value }}
+                                                            <br>
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+
+
+
+                                                </div>
+
+
+                                            </div>
+
+
+                                        </div>
+                                        <!-- End Item Details Column -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Left Column Top Row -->
+
+                        <!-- Left Column Lower Rows -->
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-12 left-col-nested">
+
+
+                                <div class="row mobile-col">
+                                    <div class="col-xs-12">
+                                        <div class="section-container item-description-container" id="item-description">
+                                            <div class="visible-xs">
+                                                <a role="button" data-toggle="collapse" href="#description"
+                                                   aria-expanded="false" aria-controls="description">
+                                                    <p>Описание лота</p><i class="icon-drop_down_arrow"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="hidden-xs">
+                                                <p class="text-medium text-center description-header">
+                                                    <strong>Описание лота</strong></p>
+
+                                            </div>
+
+                                            <div class="collapse in" id="description">
+                                                <div class="collapse-wrapper">
+
+                                                    <div class="col2">
+
+                                                        {{ object.product.description|safe }}
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+
+                                            <span id="comments"></span>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-xs-12 hidden-xs hidden-sm">
+                                        <div id="listing-comments-desktop">
+                                            <div class="comments-container">
+                                                <div class="comments-wrapper">
+                                                    <div class="hidden-xs">
+                                                        <p class="text-medium text-center description-header">
+                                                            <strong>Описание аукциона</strong></p>
+
+                                                    </div>
+                                                    <div class="col1">
+
+                                                        {{ object.description|safe }}
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-sm-3 hidden-xs hidden-sm hidden-lg right-col-nested ">
+
+                                <div class="row mobile-col">
+                                    <!--Right promo test -->
+
+                                    <div class="col-xs-12 visible-sm">
+
+
+                                    </div>
+
+                                    <div class="col-xs-12">
+                                        <div class="section-container side-container seller-info-container">
+                                            <div class="visible-xs">
+                                                <a role="button" data-toggle="collapse" href="#verifications"
+                                                   aria-expanded="false" aria-controls="verifications">
+                                                    <p>О продавце</p><i class="icon-drop_down_arrow"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="hidden-xs">
+                                                <p class="side-headline text-center"><strong>О продавце</strong>
+                                                </p>
+                                            </div>
+
+                                            <div class="collapse" id="verifications">
+                                                <div class="collapse-wrapper">
+                                                    <p><a href="#"
+                                                          class="link-blue">{{ object.product.user.username }}</a></p>
+                                                    <p>
+                                                        <i class="fa fa-star filled"></i>
+                                                        <i class="icon-star filled"></i>
+                                                        <i class="icon-star filled"></i>
+                                                        <i class="icon-star"></i>
+                                                        <i class="icon-star"></i>
+                                                        <a href="#"
+                                                           class="feedback-count">
+                                                            <span>(3)</span>
+                                                        </a>
+                                                    </p>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-xs-12 text-center">
+                                        <div class="section-container side-container community-container">
+
+
+                                        </div>
+                                    </div>
+
+                                    {#                                    <div class="col-xs-12 sticky-wrapper hidden-xs" style="display: none;">#}
+                                    {#                                        <div class="side-container sticky-container">#}
+                                    {#                                            <p class="side-headline text-center"><strong>Kryptonite Bolt Down Lock#}
+                                    {#                                                Anchor</strong></p>#}
+                                    {#                                            <p class="text-center">#}
+                                    {#                                                <span class="listing-price-text title formatted"><sup>$</sup>35</span><sup>.00</sup>#}
+                                    {#                                            </p>#}
+                                    {#                                            <a href="/checkout/kryptonite-bolt-down-lock-anchor-274449"#}
+                                    {#                                               class="btn btn-orange text-center text-medium buy-now-btn"#}
+                                    {#                                               attr-marketplace="BMW MOA">Buy Now</a>#}
+                                    {#                                            <p class="text-center"><img src="/Content/images/panjo/detail/moneyBack.svg"#}
+                                    {#                                                                        alt="Guarantee"></p>#}
+                                    {#                                        </div>#}
+                                    {#                                    </div>#}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Left Column Lower Rows -->
+                    </div>
+                    <!-- End Left Column-->
+
+                    <!-- Right Column-->
+                    <div class="col-sm-3 visible-sm visible-lg right-col">
+
+                        <div class="row mobile-col">
+                            <!--Right promo test -->
+
+                            <div class="col-xs-12 visible-sm">
+
+
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="section-container side-container seller-info-container">
+                                    <div class="visible-xs">
+                                        <a role="button" data-toggle="collapse" href="#verifications"
+                                           aria-expanded="false" aria-controls="verifications">
+                                            <p>О продавце</p><i class="icon-drop_down_arrow"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="hidden-xs">
+                                        <p class="side-headline text-center"><strong>О продавце</strong></p>
+                                    </div>
+
+                                    <div class="collapse" id="verifications">
+                                        <div class="collapse-wrapper">
+                                            <p><a href="{% url 'userprofile' object.product.user %}"
+                                                  class="link-blue">{{ object.product.user }}</a></p>
+                                            <p>
+                                                <i class="fa fa-star filled"></i>
+                                                <i class="fa fa-star filled"></i>
+                                                <i class="fa fa-star filled"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <a href="#"
+                                                   class="feedback-count">
+                                                    <span>(3)</span>
+                                                </a>
+                                            </p>
+
+
+                                            <div class="verifications-container">
+                                                <div class="verification-wrapper">
+                                                    <div class="verification-icon">
+                                                        <i class="icon-check_s"></i>
+                                                    </div>
+                                                    <div class="verification-text">
+
+                                                        <p class="text-small">Продаж </p>
+
+                                                        <p class="text-small">На ходу
+                                                            с: {{ object.product.user.date_joined|date:"F, Y" }}</p>
+                                                    </div>
+                                                </div>
+
+
+                                                <p class="text-center"><a
+                                                        href="{% url 'user_pruduct_list' object.product.user.username %}"
+                                                        class="link-blue">View Store</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 hidden-xs">
+                                <div class="side-container share-links-side">
+                                    <div class="share-links-container">
+                                        <span class="share-this share-headline text-center"><strong>Поделиться</strong></span>
+
+
+                                        <div class="addthis_inline_share_toolbox"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 text-center">
+                                <div class="section-container side-container community-container">
+
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <!-- End Right Column-->
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <script type="text/javascript">(function () {
+        if (window.pluso)if (typeof window.pluso.start == "function") return;
+        if (window.ifpluso == undefined) {
+            window.ifpluso = 1;
+            var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+            s.type = 'text/javascript';
+            s.charset = 'UTF-8';
+            s.async = true;
+            s.src = ('https:' == window.location.protocol ? 'https' : 'http') + '://share.pluso.ru/pluso-like.js';
+            var h = d[g]('body')[0];
+            h.appendChild(s);
+        }
+    })();</script>
 
 {% endblock %}
+
+{% block javascript %}
+
+    {% addthis_widget %}
+
+    <script src="{% static 'blueimp-gallery/js/blueimp-gallery.min.js' %}"></script>
+
+    <script>
+        document.getElementById('links').onclick = function (event) {
+            event = event || window.event;
+            console.log('In into carusele')
+            var target = event.target || event.srcElement,
+                    link = target.src ? target.parentNode : target,
+                    options = {index: link, event: event},
+                    links = this.getElementsByTagName('a');
+            blueimp.Gallery(links, options);
+        };
+    </script>
+
+    <script>
+        blueimp.Gallery(
+                document.getElementById('links').getElementsByTagName('a'),
+                {
+                    container: '#blueimp-gallery-carousel',
+                    carousel: true
+                }
+        );
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+
+
+            $('.col1').collapser({
+                mode: 'lines',
+                truncate: 5,
+                showText: 'Показать больше',
+                hideText: 'Скрыть',
+            });
+
+            $('.col2').collapser({
+                mode: 'lines',
+                truncate: 7,
+                showText: 'Показать больше',
+                hideText: 'Скрыть',
+            });
+
+
+        });
+
+    </script>
+
+
+{% endblock %}
+
+
+{#    {{ object.product.name }}#}
+{##}
+{#    <div id="bet" xmlns="http://www.w3.org/1999/html"> {{ object.current_price }} </div>#}
+{##}
+{##}
+{#    <div id ='mess' style="color: red"> </div>#}
+{#    {% csrf_token %}#}
+{#    <form id = "set_bet_form" action="{% url 'set_bet' %}" method="post">#}
+{##}
+{#    <input id="inn" type="number" min="{{ min_bet }}"#}
+{#            {% if object.end_price %} max="{{  object.end_price }}" {% endif %}#}
+{#            value="{{ min_bet }}"> </input>#}
+{#    <input id ="auct_id" type="hidden" value="{{ object.pk }}"> </input>#}
+{#    <input id ="user_id" type="hidden" value="{{ request.user.id}}"> </input>#}
+{#    <button type="submit"> Сделать ставку </button>#}
+{##}
+{#    </form>#}
+
+

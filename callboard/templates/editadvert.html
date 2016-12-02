@@ -1,7 +1,39 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 
 {% block content %}
 
-Edit {{ object }}
+<form action="{% url 'editadvert' object.pk %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+{{ EditAdvertForm.media }}
+{% for rec in EditAdvertForm %}
+
+    {% bootstrap_field rec %}
+
+
+    {% if rec.name == 'name' %}
+
+
+
+{#    {% for foo in EditAttrForm %}#}
+
+    {% for fields in EditAttrForm %}
+
+
+
+            {% bootstrap_field fields %}
+
+
+
+    {% endfor %}
+{#    {% endfor %}#}
+{% endif %}
+
+{% endfor %}
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "star" %} Сохранить </button>
+    {% endbuttons %}
+</form>
 
 {% endblock %}

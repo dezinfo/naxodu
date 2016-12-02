@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.urls import reverse
 from django.utils import timezone
 
@@ -18,6 +19,9 @@ class Bets(models.Model):
     creation_date = models.DateTimeField(verbose_name='date published',auto_now_add=True)
     update_date = models.DateTimeField(verbose_name='date_update',auto_now=True)
 
+    def __str__(self):              # __unicode__ on Python 2
+        return self.user.username + ' аукцион ' +str(self.auction) + ' ставка ' +str(self.bet)
+
 class Auction(models.Model):
     product = models.ForeignKey(Goods)
     description = RichTextUploadingField(verbose_name='Описание')
@@ -32,6 +36,8 @@ class Auction(models.Model):
     # winner = models.ForeignKey(User, related_name='who_winn', null=True, )
     # is_canceled = models.BooleanField(verbose_name='Аукцион завершен', default=False)
     #
+    is_closed  = models.BooleanField(verbose_name='Аукцион закрыт', default=False)
+    winner_notified  = models.BooleanField(verbose_name='Победитель проинформирован', default=False)
 
     def __str__(self):              # __unicode__ on Python 2
 
@@ -50,7 +56,7 @@ class Auction(models.Model):
             summ = self.end_price - (b)
         else:
             summ = self.start_price
-        if (self.end_date <= timezone.now() or summ == 0):
+        if (self.end_date <= timezone.now() or summ <= 0):
             return True
         else:
             return False

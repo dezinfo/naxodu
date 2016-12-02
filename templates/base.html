@@ -11,13 +11,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
    {% block social %} {% endblock %}
     <title>
-    {% block title %}
-
-    {% endblock %}
-
-    - НаХоду
+    На Ходу - {% block title %} {% endblock%}
     </title>
 
 
@@ -51,6 +48,7 @@
 
 
 {#    <script type="text/javascript" src="{% static 'slick/slick.js' %}"></script>#}
+    <script type="text/javascript" src="{% static 'js/jquery.collapser.js' %}"></script>
     <script type="text/javascript" src="{% static "js/helper.js" %}"></script>
     <script type="text/javascript" src="{% static "js/rotate.js" %}"></script>
 

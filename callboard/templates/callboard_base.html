@@ -2,24 +2,30 @@
 
 
             <div class="category-trigger">
-            {% for cat in cat_list %}
-
-                <div class="category-container">
-
-                    <div class="cat-dr">
-                    <a href="{{ cat.get_absolute_url }}" class="cat-hreff">
-                 <div class="category btn btn-primary" id = "{{ cat.pk }}">
+                <div class="index__catlist hidden-phone container-fluid">
+                     <div class="row">
+                         {% for cat in cat_list %}
 
 
-                 {{ cat.name}} {% if cat.count_products > 0 %} [{{ cat.count_products }}] {% endif %}
+
+                         <div class="cat-dr">
+                            <a href="{{ cat.get_absolute_url }}" class="cat-hreff">
+                            <img src="{{ cat.image.url }}" class="category" id = "{{ cat.pk }}">
+
+                            </a>
+                            <div class="cat-title"> <a href="{{ cat.get_absolute_url }}" class="cat-hreff"> {{ cat.name}} </a>
+                            <span class="catlist_item_count">{% if cat.count_products > 0 %} ({{ cat.count_products }}) {% endif %} </span>
+                            </div>
 
 
-                </div> </a>
-                </div>
 
+
+
+                             </div>
+                    {% endfor %}
+                    </div>
             </div>
 
-           {% endfor %}
             </div>
             <div class="cl"></div>
             <div>{% if category %} <h4 class = 'show_subcat' id="{{ category.pk }}"> Категория <strong>[{{ category.name}}]</strong>  <a href="{% url 'callboard' %}"> oчистить  </a>
