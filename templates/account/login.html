@@ -1,5 +1,5 @@
 {% extends "account/base.html" %}
-
+{% load bootstrap3 %}
 {% load i18n %}
 {% load account socialaccount %}
 
@@ -13,14 +13,10 @@
 {% get_providers as socialaccount_providers %}
 
 {% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Test sign in with one
-of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+<p>{% blocktrans with site.name as site_name %}Вы можете войти используя профиль Вашей социальной сети. Или, <a href="{{ signup_url }}">создать аккаунт</a>
+на <strong>naxodu.com</strong> и войти используя форму входа:{% endblocktrans %}</p>
 
 <div class="socialaccount_ballot">
-
-
-
 
   <a title="Facebook" class="socialaccount_provider facebook" href="/accounts/facebook/login/?process=login">
          <span class="fa-stack fa-lg">
@@ -29,7 +25,6 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 </span>
   </a>
 
-
       <a title="Odnoklassniki" class="socialaccount_provider odnoklassniki" href="/accounts/odnoklassniki/login/?process=login">
 
          <span class="fa-stack fa-lg">
@@ -37,8 +32,6 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
           <i class="fa fa-odnoklassniki fa-stack-1x"></i>
 </span>
   </a>
-
-
 
     <a title="Twitter" class="socialaccount_provider twitter" href="/accounts/twitter/login/?process=login">
          <span class="fa-stack fa-lg">
@@ -74,14 +67,25 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
+
+<div class="row">
+<div class="col-md-9">
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+
+  <div class="log_div"> {% bootstrap_field form.login %}</div>
+
+  <div class="log_div"> {% bootstrap_field form.password %}</div>
+
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+    <div class="log_div">
+     <a class="secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+     <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+     </div>
 </form>
+</div>
+</div>
 </div>
 {% endblock %}

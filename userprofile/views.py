@@ -9,18 +9,23 @@ def inbox(request):
     return HttpResponse('test')
 
 
+
 @login_required
-def profile(request,username):
+def myprofile(request):
     args = {}
-    if username == request.user.username:
-
-        p = get_object_or_404(UserProfileTable,username = request.user.id)
-        args['objects'] = p
-
-        return render_to_response('userprofile.html',args)
-
-    return HttpResponse('/')
+    p = get_object_or_404(UserProfileTable,username = request.user)
+    args['objects'] = p
+    return render(request,'myprofile.html',args)
 
 
-def userprofile(request, username):
-     return HttpResponse('Профиль пользователя:'+ username)
+@login_required
+def userprofile(request,username):
+    args = {}
+    p = get_object_or_404(UserProfileTable,username__username = username)
+    args['objects'] = p
+
+    return render(request,'userprofile.html',args)
+
+
+
+

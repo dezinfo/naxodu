@@ -15,6 +15,10 @@ class CategoryAdmin(admin.ModelAdmin):
   list_display = ['admin_name',]
 
 
+class TypeAdmin(admin.ModelAdmin):
+  model = Type
+  list_display = ['admin_name',]
+
 
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(SubCategory,SubCategoryAdmin)

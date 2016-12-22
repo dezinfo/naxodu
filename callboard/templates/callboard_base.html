@@ -1,3 +1,5 @@
+ {% load bootstrap3 %}
+{% load crispy_forms_tags %}
   <div class="col-md-10" style="padding-left: 150px">
 
 
@@ -8,20 +10,24 @@
 
 
 
-                         <div class="cat-dr">
+
+                            <div class="cat-dr">
                             <a href="{{ cat.get_absolute_url }}" class="cat-hreff">
                             <img src="{{ cat.image.url }}" class="category" id = "{{ cat.pk }}">
 
                             </a>
                             <div class="cat-title"> <a href="{{ cat.get_absolute_url }}" class="cat-hreff"> {{ cat.name}} </a>
-                            <span class="catlist_item_count">{% if cat.count_products > 0 %} ({{ cat.count_products }}) {% endif %} </span>
+{#                            <span class="catlist_item_count">{% if cat.count_products > 0 %} ({{ cat.count_products }}) {% endif %} </span>#}
                             </div>
 
-
-
-
-
                              </div>
+
+                             {% if forloop.counter|divisibleby:4 %}
+                             </div>
+                             <div class="row">
+                             {% endif %}
+
+
                     {% endfor %}
                     </div>
             </div>
@@ -41,7 +47,16 @@
 
             <form method="GET" action="{% url 'subcategory' category.slug subcategory.slug %}">
 
-                {{ attr_form.as_p }}
+                {% for field in attr_form %}
+
+                    {% bootstrap_field field show_label=False %}
+
+                {% endfor %}
+
+
+
+
+
 
             <input type="hidden" name="sort" value = {{ request.GET.sort }}>
             <input type="submit"  class="btn btn-default"> Фильтр </input>

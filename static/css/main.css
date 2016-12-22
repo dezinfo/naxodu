@@ -2,13 +2,22 @@
 
 body {
 
-    font-family: Ssans-serif, Helvetica, Arial, Tahoma;
+    font-family: 'Lato', Helvetica, Ssans-serif, Arial, Tahoma;
     height: 100%;
+    font: inherit;
+    font-size: 13px;
+
 }
 
+#id_login {
 
+    width: 160px;
+}
 
+#id_password {
 
+    width: 160px;
+}
 
 
 .navbar.navbar-inverse .navbar-form {
@@ -803,14 +812,14 @@ footer {
 
 .col-md-9 {
 
-    width: 70%;
+    width: 71%;
 }
 
 /* START advertdetail*/
 
 .listing-detail-page {
 
-    max-width: 1240px;
+    max-width: 90%;
     margin: auto;
     padding-top: 30px;
     padding-bottom: 30px;
@@ -1069,6 +1078,21 @@ footer {
     width: 152px;
 }
 
+#id_state {
+     width: 160px;
+}
+
+#id_types {
+
+    width: 152px;
+}
+
+#id_city {
+
+    width: 180px;
+}
+
+
 #id_subcategory {
 
     width: 152px;
@@ -1230,7 +1254,7 @@ a:hover {
     padding: 6px 9px 7px 7px;
     font-size: 18px;
     font-weight: bold;
-    zoom: 1px;
+    /*zoom: 1px;*/
 }
 
 .forum-last-theme{
@@ -1806,5 +1830,182 @@ hr {
     text-align: left;
     font-size: 15px;
 
+
+}
+
+.edit-account {
+
+    padding-top: 30px;
+    padding-bottom: 50px;
+    max-width: 1010px;
+    margin: auto;
+    font-size: 14px!important;
+
+}
+
+.edit-account .circle-avatar {
+    height: 100px;
+    width: 100px;
+    line-height: 20px;
+    background: #f6f6f6;
+    color: #666;
+    margin: 0 auto 5px;
+    border-radius: 50%;
+    padding: 20px 10px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px dashed #666;
+    -moz-transition: opacity .5s ease;
+    -o-transition: opacity .5s ease;
+    -webkit-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+
+@media only screen and (min-width: 767px){
+.edit-account .current-section {
+    display: none;
+}}
+
+.edit-account nav a {
+    height: 50px;
+    display: block;
+    text-align: left;
+    color: #666;
+    padding-top: 14px;
+}
+
+@media only screen and (min-width: 767px) {
+    .edit-account nav a.active {
+        background: #666;
+        color: #fff;
+    }
+}
+
+.edit-account .account-form-container {
+    margin: 0 0 0 17px;
+    padding: 34px 160px 40px;
+    background-color: #fff;
+    -moz-box-shadow: 0 0 1px 1px rgba(0,0,0,.05);
+    -webkit-box-shadow: 0 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 0 1px 1px rgba(0,0,0,.05);
+}
+
+.edit-account .user-name {
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+li {
+
+    list-style: none;
+}
+
+.color-3 {
+    color: #0098d0;
+    font-family: 'Lato';
+
+}
+
+.fbold {
+    font-weight: bold;
+}
+
+
+.formdiv .form-group {
+    float: left;
+    color: #00ba00;
+
+}
+
+.button {
+
+    border: 1px solid #0098d0;
+    background-color: #0098d0;
+
+    height: 28px;
+    cursor: pointer;
+    zoom: 1;
+    white-space: nowrap;
+}
+
+.button>* {
+    height: 28px;
+    cursor: pointer;
+    padding: 0 15px;
+}
+
+.button, .button>* {
+    line-height: 25px!important;
+}
+
+.br3 {
+
+    border-radius: 3px;
+}
+
+.fnormal {
+    font-weight: normal !important;
+}
+
+.cfff {
+    color: #fff;
+}
+
+a.cfff:hover {
+
+    color: #fff;
+
+}
+
+.button:hover {
+    background-color: #3ba8de;
+    border-color: #3ba8de;
+
+}
+
+.log_div {
+
+    padding-left: 50%;
+    align-content: center;
+
+}
+
+
+.log_div .control-label {
+
+    width: 170px;
+    line-height: 35px;
+
+}
+
+.search-auct .control-label {
+
+    line-height: 35px;
+}
+
+#id_username {
+
+    width: 152px;
+}
+
+#id_email {
+
+    width: 152px;
+}
+
+#id_password1 {
+
+    width: 152px;
+}
+
+#id_password2   {
+
+    width: 152px;
+}
+
+#auct_search {
+
+    width: 152px;
 
 }

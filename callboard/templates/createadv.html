@@ -26,6 +26,9 @@
 {% endif %}
 
 
+<div> Рубрика <a id="choose-category-button" href="javascript:void(0);"
+                 class="button cfff br3 fnormal" style="display: inline-block"> <span>Выбрать</span> </a> </div>
+
     {% csrf_token %}
 
     {% bootstrap_form form %}
@@ -47,11 +50,49 @@
 <script>
 
 
+$(function(){
+  $('select[name=subcategory]').empty();
+  $('select[name=subcategory]').prepend('<option value="" selected disabled>Выбирите категорию...</option>');
+  // called when category field changes from initial value
+  $('select[name=category]').change(function(){
+    if($("#id_category option:selected").text() != '') {
+    category_id = $('select[name=category]').val();
+    request_url = '/callboard/get_subcategory/' + category_id + '/';
+      $.ajax({
+        url: request_url,
+        type: "GET",
+        success: function(data){
+          $('select[name=subcategory]').empty();
+          $('select[name=subcategory]').prepend('<option value="" selected>Подкатегория...</option>');
+          $.each(data, function(key, value){
+
+            $('select[name=subcategory]').append('<option value="' + key + '">' + value + '</option>');
+          });
+        }
+      })
+    }
+  })
+});
+
+
+
 $("#id_subcategory").change(function(){
 
-    id = $("#id_subcategory").val();
+    sub_id = $("#id_subcategory").val();
     $(".formdiv").remove();
-    get_attr_form(id);
+    get_attr_form(sub_id,'');
+
+
+
+});
+
+
+$("#id_types").change(function(){
+
+    sub_id = $("#id_subcategory").val();
+    id_type = $("#id_types").val();
+    $(".formdiv").remove();
+    get_attr_form(sub_id,id_type);
 
 
 

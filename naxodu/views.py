@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
+from naxodu import settings
 from callboard.models import Goods
 from community.models import Forums, Articles
 from django import template
@@ -30,9 +30,10 @@ def getuw(username):
 def index(request):
 
 
+    if settings.UNDER_CUNSTRUCTION:
+        return render(request,'index1.html')
 
-
-    content = Goods.objects.only_active().order_by('-creation_date')[:6]
+    content = Goods.objects.only_active().order_by('-order_date')[:6]
 
     aukc = None
 

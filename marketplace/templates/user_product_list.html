@@ -13,11 +13,21 @@
                             <tbody>
 
                             {% for item in market %}
-                            <tr>
+                            <tr id="{{ item.pk }}">
                             <td id="markname"> {{ item.name }}
                                 <div id="action">
-                                    <a href="{% url 'editadvert' item.pk%}"> Edit </a>
-                                    <a href="{% url 'advdetail' item.pk %}"> View </a>
+                                    <a href="{% url 'editadvert' item.pk%}"> Редактировать </a>
+                                    <a href="{{ item.get_absolute_url }}"> Просмотр </a>
+
+                                    {% if item.is_active %}
+                                    <a href="{% url 'change_product_status' item.pk  %}"> Деактивировать </a>
+                                    {% else %}
+                                    <a href="{% url 'change_product_status' item.pk  %}"> Активировать </a>
+
+                                    {% endif %}
+
+                                    <a href="{% url 'delete_product' item.pk  %}"> Удалить </a>
+
                                 </div>
                             </td>
                             <td>{{ item.subcategory }}</td>

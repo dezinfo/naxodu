@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load set_url_param %}
-
+{% load bootstrap3 %}
 {% block content %}
 
 
@@ -11,20 +11,32 @@
          <div class="search-auct">
         <form method="GET" action="{% url 'auction_list' %}">
 
-        {{ filter_form.as_p }}
+
+        {% bootstrap_form filter_form %}
+
     <input type="hidden" name="q" value = {{ request.GET.q }}>
     <input type="hidden" name="sort" value = {{ request.GET.sort }}>
-             <div id="submit-btn">
+             <div class="form-group">
 
             <button type="submit" class="auct btn btn-primary"> Фильтр </button>
 
+
+             {% if request.GET %}
+                              <div class="auct" style="text-align: right; margin-right: 30px; font-size: 12px">
+
+                           <a href='{% url 'auction_list' %}' style="align: right">Очистить фильтр</a></div>
+             {% endif %}
+
              </div>
+
+
     </form>
-    <div style="text-align: right; margin-right: 30px; font-size: 12px">
-             <a href='{% url 'auction_list' %}' style="align: right">Очистить фильтр</a>
+
     </div>
+
     </div>
-    </div>
+
+
 
 
     <div class="col-md-8">
@@ -34,5 +46,49 @@
 
 </div>
 
+
+    <script>
+
+
+
+  $(function(){
+
+  if($("#id_category option:selected").val() == '') {
+
+  $('select[name=subcategory]').empty();
+  $('select[name=subcategory]').prepend('<option value="" selected disabled>Выбирите категорию...</option>');
+
+  }
+
+
+  // called when category field changes from initial value
+  $('select[name=category]').change(function(){
+    if($("#id_category option:selected").val() != '') {
+    category_id = $('select[name=category]').val();
+    request_url = '/callboard/get_subcategory/' + category_id + '/';
+      $.ajax({
+        url: request_url,
+        type: "GET",
+        success: function(data){
+          $('select[name=subcategory]').empty();
+          $('select[name=subcategory]').prepend('<option value="" selected>Все</option>');
+          $.each(data, function(key, value){
+
+            $('select[name=subcategory]').append('<option value="' + key + '">' + value + '</option>');
+          });
+        }
+      });
+    }
+      else {
+
+          $('select[name=subcategory]').empty();
+        $('select[name=subcategory]').prepend('<option value="" selected disabled>Выбирите категорию...</option>');
+    }
+
+  })
+});
+
+
+    </script>
 
 {% endblock %}

@@ -51,15 +51,25 @@ class Auction(models.Model):
     def is_canceled(self):
         summ = 0
         b = self.winner_bet.aggregate(Max('bet'))['bet__max']
-        if b is not None and self.end_price > 0:
 
-            summ = self.end_price - (b)
+        if self.end_price:
+
+            if b is not None and self.end_price > 0:
+
+                summ = self.end_price - (b)
+            else:
+                summ = self.start_price
+
+            if (self.end_date <= timezone.now() or summ <= 0):
+                return True
+            else:
+                return False
         else:
-            summ = self.start_price
-        if (self.end_date <= timezone.now() or summ <= 0):
-            return True
-        else:
-            return False
+            if (self.end_date <= timezone.now()):
+                return True
+            else:
+                return False
+
 
 
 

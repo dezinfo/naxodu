@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="container-fluid edit-account">
+        <div id="edit-account">
+            <div data-reactroot="" class="row">
+                <div class="col-xs-3 stack">
+                    <nav class="nav nav-pills nav-stacked">
+                        <div class="current-section"><!-- react-text: 5 -->Settings: <!-- /react-text --><span
+                                id="current">Edit Account</span></div>
+                        <ul style="display: none;">
+                            <li class="active"><a href="/" class="panel-btn active">Редактировать профиль</a></li>
+                            <li class=""><a href="/addresses" class="panel-btn">Контактная информация</a></li>
+                            <li class=""><a href="/emailpreferences" class="panel-btn">Описание магазина</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-xs-12 col-sm-9">
+                    <div class="account-form-container" id="account-edit-form">
+                        <div class="text-center"><span class="text-medium account-header">Редактировать профиль</span></div>
+                        <div class="main-avatar">
+                            <div>
+
+
+
+                                <div class="circle-avatar"
+                                     style="position: relative; overflow: hidden; direction: ltr;">Загрузить аватар
+
+                                                              {% if objects.user_image %}
+                                    <img id="user_image" src="{{ objects.user_image.url }}" alt="Фото"  style="height: 800px; width: 600px"/>
+                                 {% else %}
+                                           <img id="user_image" src="#" alt="Фото" style="height: 150px; width: 150px"/>
+                                {% endif %}
+
+                                    <input id="file_input" title="file input"
+                                                multiple="" type="file" name="qqfile"
+                                                style="position: absolute; right: 0px; top: 0px; font-family: Arial; font-size: 118px; margin: 0px; padding: 0px; cursor: pointer; opacity: 0; height: 100%;">
+                                </div>
+                                <p class="text-warning text-center"></p></div>
+                            <div class="user-name">{{ objects.username }}</div>
+
+                        </div>
+
+                        <br>
+                        <div class="alert alert-danger hidden">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="alert alert-success hidden">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span></button>
+                            <p></p></div>
+                        <div class="row">
+                            <div class="col-xs-6 no-pad-right right-border"><label class="card-label input-label"><span
+                                    class="field-name" style="opacity: 0;">Имя</span><input type="text"
+                                                                                                   autocomplete="off"
+                                                                                                   name=""
+                                                                                                   class="card-field input-field"
+                                                                                                   placeholder="Имя"
+                                                                                                   maxlength="60"
+                                                                                                   value="">
+                                <div class="invalid-bottom-bar"></div>
+                            </label></div>
+                            <div class="col-xs-6 no-pad-left"><label class="card-label input-label"><span
+                                    class="field-name" style="opacity: 0;">Фамилия</span><input type="text"
+                                                                                                  autocomplete="off"
+                                                                                                  name=""
+                                                                                                  class="card-field input-field"
+                                                                                                  placeholder="Фамилия"
+                                                                                                  maxlength="60"
+                                                                                                  value="">
+                                <div class="invalid-bottom-bar"></div>
+                            </label></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12"><label class="card-label input-label"><span class="field-name"
+                                                                                               style="opacity: 1;">Почта</span><input
+                                    type="email" autocomplete="off" name="" class="card-field input-field"
+                                    placeholder="Почта" required maxlength="60" value={{ objects.username.email }} >
+                                <div class="invalid-bottom-bar"></div>
+                            </label></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12"><label class="card-label"><span
+                                    class="field-name display">Пароль</span>
+                                <div class="card-field"><a>Изменить пароль</a></div>
+                            </label><a class="btn btn-primary">Сохранить изменения</a></div>
+                        </div>
+
+
+
+                        <div class="modal fade in" id="change-pw">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <button type="button" class="close" data-dismiss="modal">×</button>
+                                            <div class="col-xs-12 text-center">
+                                                <div class="text-medium modal-title">Change Password</div>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <div class="alert alert-danger hidden"></div>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <div class="alert alert-success hidden"><p></p></div>
+                                            </div>
+                                            <div class="col-xs-12"><label class="card-label input-label"><span
+                                                    class="field-name" style="opacity: 0;">Current Password</span><input
+                                                    type="password" autocomplete="off" name=""
+                                                    class="card-field input-field" placeholder="Current Password"
+                                                    maxlength="60" value="">
+                                                <div class="invalid-bottom-bar"></div>
+                                            </label></div>
+                                            <div class="col-xs-12"><label class="card-label input-label"><span
+                                                    class="field-name" style="opacity: 0;">New Password</span><input
+                                                    type="password" autocomplete="off" name=""
+                                                    class="card-field input-field" placeholder="New Password"
+                                                    maxlength="60" value="">
+                                                <div class="invalid-bottom-bar"></div>
+                                            </label></div>
+                                            <div class="col-xs-12"><label class="card-label input-label"><span
+                                                    class="field-name"
+                                                    style="opacity: 0;">Confirm New Password</span><input
+                                                    type="password" autocomplete="off" name=""
+                                                    class="card-field input-field" placeholder="Confirm New Password"
+                                                    maxlength="60" value="">
+                                                <div class="invalid-bottom-bar"></div>
+                                            </label></div>
+                                            <div class="col-xs-12"><a class="btn btn-primary save-btn">Update
+                                                Password</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+
+
+
+    function readURL(input) {
+
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#user_image').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$("#file_input").change(function(){
+    readURL(this);
+});
+</script>
+
+{% endblock %}

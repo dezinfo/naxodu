@@ -17,15 +17,15 @@
 
 {% block social %}
 
-    <meta  name="description" content="{{ adv.name }} " >
 
     <meta property="og:title" content="{{ adv.name }}" />
+    <meta property = "og:type" content = "article" />
 {#    <meta property="og:description" content= '{% autoescape off %}{{ adv.description }}{% endautoescape %}' />#}
-    <meta property="og:image" content='http://avtocry.com{{ adv.get_image.url }}'  />
+    <meta property="og:image" content='http://naxodu.com{{ adv.get_image.url }}'  />
     <meta property="og:image:width" content='200'  />
     <meta property="og:image:height" content='200'  />
-
-{#    <meta property="og:url" content="http://avtocry.com" />#}
+    <meta property="og:url" content="http://naxodu.com" />
+    <meta property="fb:app_id" content="1561431320843109" />
 
 
 {% endblock %}
@@ -243,18 +243,31 @@
 
                                             </div>
 
+
+
+
+
                                             <div class="attributes">
 
+
+
                                                    {% for foo in attribute %}
-                                                            {% if foo.value %}
-                                                                {{ foo.attribute_name.verbos_name }} :
-                                                                {{ foo.value}}
-                                                                 <br>
-                                                            {% endif %}
+
+                                                                {{ foo.0 }} :
+                                                                {{ foo.1}}
+                                                                    {% if forloop.counter|divisibleby:3 %}
+
+                                                                        <br>
+
+                                                                    {% endif %}
+
 
                                                    {% endfor %}
 
                                                 </div>
+
+
+
                                             <hr>
                                             <div class="collapse in" id="description">
                                                 <div class="collapse-wrapper">
@@ -482,7 +495,7 @@
                                         <div class="collapse-wrapper">
                                             <p><a href="{% url 'userprofile' request.user.username %}" class="link-blue">{{ adv.user }}</a><sup>{% user_status adv.user%}</sup></p>
 
-                                            {{ adv.user.last_login}}
+                                            {{ adv.user.userprofile}}
 
                                             {% if user_status != 'В сети' %}
                                                     {{ adv.user.last_login }}

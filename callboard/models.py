@@ -5,21 +5,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from time import  time
 from django.utils import timezone
-
-
-from django.db.models.functions import datetime
 from smart_selects.db_fields import ChainedForeignKey
-
 from django.conf import  settings
 from PIL import Image
 from pytils.translit import slugify
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
-from tinymce.models import HTMLField
 from django.contrib import admin
 from ckeditor.fields import RichTextField
 from userprofile.models import States,Cities
-
+from django.contrib.postgres.fields import JSONField
+from userprofile.models import States,Cities
 
 
 # Create your models here.
@@ -52,10 +48,11 @@ class Attribute(models.Model):
     name = models.CharField(max_length=30)
     verbos_name = models.CharField(max_length=50)
     ordering = models.PositiveIntegerField(verbose_name="Сортировка", blank=True, null=True)
-    type = models.CharField(verbose_name="Тип поля",choices=VALUE_TYPE, max_length=15,default='text')
+    attr_type = models.CharField(verbose_name="Тип поля",choices=VALUE_TYPE, max_length=15,default='text')
     required = models.BooleanField(default=False)
     filtering = models.BooleanField(default=False)
     key_words = models.BooleanField(default=False)
+
     def __str__(self):              # __unicode__ on Python 2
        return str(self.name)
 
@@ -166,16 +163,10 @@ class SubCategory(models.Model):
 
 class Type(models.Model):
     category = models.ForeignKey(Category,verbose_name='Карегория')
-    subcategory = ChainedForeignKey(
-        SubCategory,
-        chained_field="category",
-        chained_model_field="category",
-        show_all=False,
-        auto_choose=True, verbose_name='Подкатегория',blank=True
-    )
-    name = models.CharField(verbose_name='Тип',max_length=60)
+    subcategory = models.ForeignKey(SubCategory,verbose_name='Подкатегория',blank=True,related_name='type')
+    name = models.CharField(verbose_name='Тип',max_length=60, unique=True)
     slug = models.SlugField(max_length=60,blank=True)
-
+    attributes = models.ManyToManyField(Attribute, verbose_name='Доступные аттрибуты', blank=True)
     def save(self,*args,**kwargs):
         self.slug = slugify(self.name)
         super(Type, self).save(*args, **kwargs)
@@ -185,20 +176,26 @@ class Type(models.Model):
 
 
 
+    def admin_name(self):              # __unicode__ on Python 2
+         return self.category.name+'>'+self.subcategory.name+'>'+self.name
 
+
+    admin_name.short_description = 'Full name'
 
 
 
 class Goods(models.Model):
     category = models.ForeignKey(Category,verbose_name='Карегория')
 
-    subcategory = ChainedForeignKey(
-        SubCategory,
-        chained_field="category",
-        chained_model_field="category",
-        show_all=False,
-        auto_choose=True, verbose_name='Подкатегория',blank=True
-    )
+    # subcategory = ChainedForeignKey(
+    #     SubCategory,
+    #     chained_field="category",
+    #     chained_model_field="category",
+    #     show_all=False,
+    #     auto_choose=True, verbose_name='Подкатегория',blank=True
+    # )
+
+    subcategory = models.ForeignKey(SubCategory,verbose_name='Подкатегория',related_name='subcategory_set')
 
     # type = ChainedForeignKey(
     #     Type,
@@ -208,7 +205,7 @@ class Goods(models.Model):
     #     auto_choose=True, verbose_name='Тип',blank=True
     # )
 
-
+    types = models.ForeignKey(Type, verbose_name='Тип', null=True, related_name='type_set')
     name = models.CharField(verbose_name='Заголовок',max_length=250)
     price = models.PositiveIntegerField(verbose_name='Цена', null=False,blank=False)
     description = RichTextField(verbose_name='Описание', null=False,blank=False,config_name='good_ckeditor')
@@ -226,7 +223,18 @@ class Goods(models.Model):
     city = models.ForeignKey(Cities,verbose_name='Город',null=True,blank=True)
     currency = models.CharField(choices=CURR, default='UAH', max_length=3)
     order_date = models.DateTimeField(verbose_name='Дата для сортировки', blank=True)
+    attributes = JSONField(verbose_name='Аттрибуты',null=True)
+    state = models.ForeignKey(States,verbose_name='Область', related_name='state_set',null=True)
+    city = models.ForeignKey(Cities, verbose_name='Город',related_name='city_set', null=True)
 
+
+    # city = ChainedForeignKey(
+    #     Cities,
+    #     chained_field="state",
+    #     chained_model_field="state",
+    #     show_all=False,
+    #     auto_choose=False, verbose_name='Город',null=True
+    # )
     objects = GoodsManager()
 
     @property
@@ -269,8 +277,8 @@ class Goods(models.Model):
         super(Goods, self).save(*args, **kwargs)
 
 
-
-
+    def get_absolute_url(self):
+        return  reverse('advdetail', kwargs={'pk': self.pk})
 
 
     def ua_price(self):
@@ -308,7 +316,7 @@ class Goods(models.Model):
 
     def order_count(self):
 
-        oc =self.order_item_goods.filter(order__order_status__in=['Accept','New','Reject']).count()
+        oc =self.order_goods.filter(order__order_status__in=['Accept','New','Reject']).count()
 
 
         return oc

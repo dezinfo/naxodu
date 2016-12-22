@@ -1,5 +1,6 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.views.generic import ListView
 
@@ -15,7 +16,7 @@ from django.template import RequestContext
 class UserProductListView(ListView):
 
     model = Goods
-    queryset = Goods.objects.all().select_related('user').order_by('-update_date')
+    queryset = Goods.objects.only_active().select_related('user').order_by('-order_date')
 
     def get_context_data(self,*args, **kwargs):
 
@@ -55,25 +56,21 @@ class UserProductListView(ListView):
 
 
 
+@login_required
+def pruduct_list(request):
 
-def pruduct_list(request,user_name):
-    if request.user.username == user_name:
         sort = request.GET.get('sort')
         args={}
+
         if sort is not None:
 
-            args['market'] = market = Goods.objects.filter(user__username=user_name).order_by(str(sort))
+            args['market']  = Goods.objects.filter(user=request.user).order_by(str(sort))
         else:
-            args['market'] = market = Goods.objects.filter(user__username=user_name)
+            args['market'] = Goods.objects.filter(user=request.user).order_by('-order_date')
 
-        args['username'] = user_name
-        args['request'] = request
 
-        # args['uw'] = getuw(user_name)
+        return render(request,'marketplace.html', args)
 
-        return render_to_response('marketplace.html', args)
-    else:
-        return HttpResponseRedirect('/')
 
 
 
@@ -98,3 +95,28 @@ def order_list(request, user_name):
         return render_to_response('marketplace.html', args)
     else:
         return HttpResponseRedirect('/')
+
+
+
+@login_required
+def change_product_status(reques, product_id):
+    product = get_object_or_404(Goods, pk = product_id)
+    if reques.user == product.user:
+        if product.is_active == True:
+            product.is_active=False
+            product.save()
+
+        else:
+            product.is_active= True
+            product.save()
+
+    return  HttpResponse('Статус измененн')
+
+@login_required
+def delete_product(reques, product_id):
+    product = get_object_or_404(Goods, pk = product_id)
+    if reques.user == product.user:
+        product.delete()
+
+
+    return  HttpResponse('Объявление удалено')

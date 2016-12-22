@@ -12,9 +12,9 @@ from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from haystack.query import SearchQuerySet
 from django_filters import FilterSet
-from sxodu import settings
+from naxodu import settings
 from django.core.paginator import Paginator
-from callboard.models import Category, Goods, SubCategory, AttributeMap, AttributeValue
+from callboard.models import Category, Goods, SubCategory, AttributeMap, AttributeValue, Attribute, Type
 from callboard.forms import AdverForm, GoodsImageGallery, ProductFilterForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
@@ -32,57 +32,68 @@ from django.contrib import  auth
 
 
 def advdetail(request,pk):
-    # uw=getuw(request.user.username)
+
     args = {}
     # args['username'] = request.user.username
     # args['uw'] = uw
     good = get_object_or_404(Goods,pk=pk)
-    test = request.session.get('has_viewd_%s' % pk,False)
-    # добавляем один просмотр за сессию... автору просмотр не засчитывается
-    if (request.session.get('has_viewd_%s' % pk)!=True and request.user != good.user):
-            request.session['has_viewd_%s' % pk] = True
-            # good = Goods.objects.get(pk=pk)
 
-            good.views = good.views+1
-            good.save()
-            args['adv'] = good
-            attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
-            args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
-            args['attribute'] = attribute
-            args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
-            args['request'] = request
+    if (good.is_active or request.user==good.user):
 
-            try:
-                releted_products = attribute.get(attribute_name_id__key_words=True)
-                if releted_products:
-                    val = releted_products.value()
+        test = request.session.get('has_viewd_%s' % pk,False)
+        # добавляем один просмотр за сессию... автору просмотр не засчитывается
+        if (request.session.get('has_viewd_%s' % pk)!=True and request.user != good.user):
+                request.session['has_viewd_%s' % pk] = True
+                # good = Goods.objects.get(pk=pk)
 
-                    args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
-            except:
-
-                args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
-
-            return  render(request,'advdetail.html', args)
+                good.views = good.views+1
+                good.save()
+                args['adv'] = good
+                # attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
+                args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
+                # args['attribute'] = attribute
+                args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
+                args['request'] = request
+                args['request'] = request
+                if good.attributes:
+                    args['attribute'] = get_attribute_value(good.attributes)
 
 
-    attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
-    args['adv'] = good
-    args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
-    args['attribute'] = attribute
-    args['request'] = request
-    args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
+                try:
+                    releted_products = good.subcategory.attributes.get(attribute_name_id__key_words=True)
+                    if releted_products:
+                        val = releted_products.value()
 
-    try:
-        releted_products = attribute.get(attribute_name_id__key_words=True)
-        if releted_products:
-            val = releted_products.value()
+                        args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
+                except:
 
-            args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
-    except:
+                    args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
 
-        args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
+                return  render(request,'advdetail.html', args)
 
-    return  render(request,'advdetail.html', args)
+
+        # attribute= good.attributemap_set.all().order_by('attribute_name_id__ordering')
+        args['adv'] = good
+        args['fotolist'] = good.goodsimagegallery_set.all().select_related('good')
+        if good.attributes:
+            args['attribute'] = get_attribute_value(good.attributes)
+        # args['attribute'] = attribute
+        args['request'] = request
+        args['user_products'] = Goods.objects.filter(user=good.user).order_by('-order_date').exclude(id=good.pk)[:8]
+
+        try:
+            releted_products = good.subcategory.attributes.get(attribute_name_id__key_words=True)
+            if releted_products:
+                val = releted_products.value()
+
+                args['releted_products'] = Goods.objects.filter(attributemap__attribute_value__vallue=val).order_by('?').exclude(id=good.pk)[:5]
+        except:
+
+            args['releted_products'] = Goods.objects.filter(subcategory=good.subcategory).order_by('?').exclude(id=good.pk)[:5]
+
+        return  render(request,'advdetail.html', args)
+
+    return redirect('/')
 
 
 
@@ -100,28 +111,51 @@ def editadvert(request,adv_id):
             # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
             eattf = EditAttrForm(request.POST,obj=obj)
             if eaf.is_valid():
-                eaf.save()
 
-                att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
-                for attr in att_map:
-                        a = request.POST.get(attr.attribute_name.name)
-                    # if request.POST.get(attr.attribute_name.name):
-                        a_val = request.POST.get(attr.attribute_name.name)
-                        if attr.attribute_name.type =='choice':
-                            if a:
-                                a_val_obj = AttributeValue.objects.get(pk=a_val)
+                     attr_dic = {}
+                     for attr in obj.subcategory.attributes.all().order_by('ordering'):
+                        if request.POST.get(attr.name):
+                            attr_desc={}
+                            attr_desc['verbos_name'] = attr.verbos_name
+                            if attr.attr_type =='choice':
+                                attr_desc['value'] = str(attr.attributevalue_set.get(pk=request.POST.get(attr.name)).pk)
+                                attr_desc['value_name'] = attr.attributevalue_set.get(pk=request.POST.get(attr.name)).vallue
                             else:
-                                a_val_obj = None
-                            AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
+                                attr_desc['value'] = request.POST.get(attr.name)
+                                attr_desc['value_name'] = request.POST.get(attr.name)
 
-                                                                 defaults={'attribute_value': a_val_obj})
-                        else:
+                            attr_desc['ordering'] = attr.ordering
+                            attr_desc['filtering'] = attr.filtering
+                            attr_dic[attr.name] = attr_desc
 
-                            AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
 
-                                                                  defaults={'attribute_value_manual': a_val})
+            eaf.instance.attributes = attr_dic
+            eaf.save()
+            return redirect('/')
 
-                return redirect('/')
+                # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+                # for attr in att_map:
+                #         a = request.POST.get(attr.attribute_name.name)
+                #     # if request.POST.get(attr.attribute_name.name):
+                #         a_val = request.POST.get(attr.attribute_name.name)
+                #         if attr.attribute_name.type =='choice':
+                #             if a:
+                #                 a_val_obj = AttributeValue.objects.get(pk=a_val)
+                #             else:
+                #                 a_val_obj = None
+                #             AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
+                #
+                #                                                  defaults={'attribute_value': a_val_obj})
+                #         else:
+                #
+                #             AttributeMap.objects.update_or_create(product_name = eaf.instance, attribute_name=attr.attribute_name,
+                #
+                #                                                   defaults={'attribute_value_manual': a_val})
+
+
+
+
+
         else:
             eaf = EditAdvertForm(instance=obj)
             # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
@@ -148,40 +182,48 @@ def all(items):
 def createadv(request):
 
 
-    # uw=getuw(request.user.username)
-
-
     url = request.POST.get('next','/')
-    form = AdverForm(request.POST or None, request.FILES or None)
 
+    form = AdverForm(request.POST or None, request.FILES or None)
     if request.method =='POST':
 
      if form.is_valid():
          form.instance.user = request.user
 
+         attr_dic = {}
 
-         form.save()
-
-         for attr in form.cleaned_data['subcategory'].attributes.all():
+         for attr in form.cleaned_data['subcategory'].attributes.all().order_by('ordering'):
             if request.POST.get(attr.name):
-                if attr.type =='choice':
-                    val = AttributeValue.objects.get(pk=request.POST.get(attr.name))
-                    AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value=val)
+                attr_desc={}
+                attr_desc['verbos_name'] = attr.verbos_name
+
+                if attr.attr_type =='choice':
+                    attr_desc['value'] = str(attr.attributevalue_set.get(pk=request.POST.get(attr.name)).pk)
+                    attr_desc['value_name'] = attr.attributevalue_set.get(pk=request.POST.get(attr.name)).vallue
+
                 else:
-                    val = request.POST.get(attr.name)
-                    AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value_manual=val)
+                    attr_desc['value'] = request.POST.get(attr.name)
+                    attr_desc['value_name'] = request.POST.get(attr.name)
 
+                attr_desc['ordering'] = attr.ordering
+                attr_desc['filtering'] = attr.filtering
+                attr_dic[attr.name] = attr_desc
 
+                #
+                # if attr.type =='choice':
+                #     val = AttributeValue.objects.get(pk=request.POST.get(attr.name))
+                #     AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value=val)
+                # else:
+                #     val = request.POST.get(attr.name)
+                #     AttributeMap.objects.create(product_name = form.instance, attribute_name=attr, attribute_value_manual=val)
+
+         form.instance.attributes = attr_dic
+         form.save()
          return redirect(url,{'username':request.user.username})
 
     args = {}
-    args['username'] = request.user.username
     args['form'] = form
-
     args['next'] = url
-    args['request'] = request
-
-
     return  render(request,'createadv.html', args)
 
 def notes(request):
@@ -220,9 +262,9 @@ class ProductFilter(FilterSet):
     name = django_filters.CharFilter(name='name', lookup_type='icontains',distinct=True)
     min_price = django_filters.NumberFilter(name='price', lookup_type='gte',distinct=True)
     max_price = django_filters.NumberFilter(name='price', lookup_type='lte',distinct=True)
-    MarkaMoto = django_filters.CharFilter(name='attributemap__attribute_value__id',lookup_type='icontains',distinct=True)
-    ModelMoto = django_filters.CharFilter(name='attributemap__attribute_value__id',lookup_type='icontains',distinct=True)
-    CreatYear = django_filters.CharFilter(name='attributemap__attribute_value_manual',lookup_type='icontains',distinct=True)
+    MarkaMoto = django_filters.CharFilter(name='attributes',lookup_type='MarkaMoto__value__contains',distinct=True)
+    ModelMoto = django_filters.CharFilter(name='attributes',lookup_type='ModelMoto__value__contains',distinct=True)
+    CreatYear = django_filters.CharFilter(name='attributes',lookup_type='CreatYear__value__contains',distinct=True)
 
     class Meta:
         model = Goods
@@ -251,8 +293,8 @@ def product_list(request):
         else:
             qs = Goods.objects.all().order_by(sort)
 
-    f = ProductFilter(request.GET, queryset=qs)
-    return render(request,'callboard/goods_list.html',{"object_list":f})
+    filter = ProductFilter(request.GET, queryset=qs)
+    return render(request,'callboard/goods_list.html',{"object_list":filter})
 
 class FilterMixin(object):
     filter_class = None
@@ -322,7 +364,7 @@ class ProductListView(FilterMixin,ListView):
 
 
 
-             attr_form = AddAttrFilterForm(self.request.POST or None, sub_category=subcategory)
+             attr_form = AddAttrFilterForm(data=self.request.GET or None, sub_category=subcategory)
              context['attr_form'] = attr_form
 
              context['subcategory'] = subcategory
@@ -412,23 +454,42 @@ def get_subcategory_list(request, category_id):
 
 
 
-def get_attribute_form(request,subcategory_id,it_creation=''):
+def get_attribute_form(request,subcategory_id,type_id):
 
 
+    try:
+        subcategory = SubCategory.objects.get(pk=subcategory_id)
+    except:
+        subcategory=None
 
+    try:
+        type = Type.objects.get(pk=type_id)
+    except:
+        type=None
 
-    subcategory = SubCategory.objects.get(pk=subcategory_id)
+    if subcategory.attributes.count() > 0 and subcategory.type.count()==0:
+        form = AddAttrForm(sub_category=subcategory,type_id=type)
 
-    form = AddAttrForm(sub_category=subcategory,it_creation=it_creation)
+        args ={}
+        args['form'] = form
+        # print(form)
+        if form:
+            return TemplateResponse(request,'attr_form.html',args)
+        else:
+            return  HttpResponse('pass')
 
-    args ={}
-    args['form'] = form
-    # print(form)
-    if form:
-        return TemplateResponse(request,'attr_form.html',args)
-    else:
-        return  HttpResponse('pass')
+    if type and type.attributes.count() >0:
+        form = AddAttrForm(sub_category=subcategory,type_id=type)
 
+        args ={}
+        args['form'] = form
+        # print(form)
+        if form:
+            return TemplateResponse(request,'attr_form.html',args)
+        else:
+            return  HttpResponse('pass')
+
+    return  HttpResponse('pass')
 
 
 def my_send_mail():
@@ -443,3 +504,16 @@ def my_send_mail():
 #         args['sort'] = sort
 #
 #     return render_to_response('callboard/goods_list.html', args, context_instance=RequestContext(request))
+
+def get_attribute_value(attr_list):
+
+
+    global_list=[]
+    sorted_d = sorted(attr_list.items(), key=lambda v: v[1]['ordering'])
+    for s in sorted_d:
+        list=[]
+        list.append(s[1]['verbos_name'])
+        list.append(s[1]['value_name'])
+        global_list.append(list)
+
+    return global_list

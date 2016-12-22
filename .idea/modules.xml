@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sxodu.iml" filepath="$PROJECT_DIR$/.idea/sxodu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../naxodu/.idea/naxodu.iml" filepath="$PROJECT_DIR$/../naxodu/.idea/naxodu.iml" />
     </modules>
   </component>
 </project>

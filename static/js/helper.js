@@ -68,7 +68,6 @@ frm.submit(function(){
                     }
                 else {
 
-                    console.log(data['min_bet']);
                     $("#mess").html(data['bet']);
                     $("#inn").val(data['min_bet']);
                     $("#inn").attr('min',data['min_bet']);
@@ -153,20 +152,30 @@ function getParameterByName(name, url) {
 
 
 
-function get_attr_form(subcategory_id)
+function get_attr_form(subcategory_id, type_id)
 {
+        if (type_id != ''){
+
+            url = "/callboard/get_attribute_form/" + subcategory_id+ "/"+type_id+"/"
+        }
+        else {
+
+            url = "/callboard/get_attribute_form/" + subcategory_id+ "/"
+        }
         $.ajax({
-            url: "/callboard/get_attribute_form/" + subcategory_id+ "/yes/",
+            url: url,
             type: "GET",
             //data: {subcategory_id: subcategory_id},
             success: function(response) {
 
-              // response is form in html format
-
+              // response is form in html forma
               div = '<div class="formdiv"></div>';
-              console.log(response)
+              //console.log(response)
+              if (response != "pass") {
               $("#id_name").after(div);
               $(".formdiv").html(response);
+              }
+
 
             }
         })
@@ -174,10 +183,11 @@ function get_attr_form(subcategory_id)
 
 
 
+
 function get_subcat_list(category_id)
 {
         $.ajax({
-            url: "/callboard/get_subcategory_list/" + category_id,
+            url: "/callboard/get_subcategory_list/" + category_id+"/",
             type: "GET",
             //data: {subcategory_id: subcategory_id},
             success: function(data) {

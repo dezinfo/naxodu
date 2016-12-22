@@ -6,6 +6,7 @@ from PIL import Image
 from haystack.forms import SearchForm
 from tinymce.widgets import TinyMCE
 from django import forms
+from userprofile.models import UserProfileTable
 
 
 
@@ -23,55 +24,81 @@ class EditAttrForm(forms.Form):
     def __init__(self, *args, **kwargs):
          
          obj = kwargs.pop('obj')
-         att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+         # att_map = AttributeMap.objects.filter(product_name=obj).order_by('attribute_name__ordering')
+         # g = Goods.objects.get(pk=obj.pk)
+         att_map = obj.subcategory.attributes.all().order_by('ordering')
+         attributes = obj.attributes
+         print(att_map)
+
          super(EditAttrForm, self).__init__(*args, **kwargs)
 
          for i in att_map:
 
-             if i.attribute_name.type == 'choice':
+             try:
+                initial = attributes[i.name]['value']
+             except:
+                 initial = ''
 
-                    self.fields[i] = forms.ModelChoiceField(
-                                label=i.attribute_name.verbos_name,
-                                initial=i.attribute_value,
+             if i.type == 'choice':
 
-                                queryset=AttributeValue.objects.filter(attribute=i.attribute_name),
-                                widget=forms.Select(attrs={'class': i.attribute_name, 'name':i.attribute_name},),
-                                required=i.attribute_name.required
+                    self.fields[i.name] = forms.ModelChoiceField(
+                                label=i.verbos_name,
+                                initial=initial,
+
+                                queryset=AttributeValue.objects.filter(attribute=i),
+                                widget=forms.Select(attrs={'class': i.name, 'name':i.name},),
+                                required=i.required
 
 
                                 )
-                    print(i.attribute_value)
-             elif i.attribute_name.type == 'text':
+
+             elif i.type == 'text':
 
 
-                    self.fields[i] = forms.CharField(
-                                label=i.attribute_name.verbos_name,
-                                initial=i.attribute_value_manual,
-                                required=i.attribute_name.required,
-                                widget=forms.TextInput(attrs={'class': i.attribute_name,'name':i.attribute_name})
+                    self.fields[i.name] = forms.CharField(
+                                label=i.verbos_name,
+                                initial=initial,
+                                required=i.required,
+                                widget=forms.TextInput(attrs={'class': i.name,'name':i.name})
                                 )
-                    print(i.attribute_value_manual)
+                    # print(i.attribute_value_manual)
              else:
-                    self.fields[i] = forms.IntegerField(
-                                label=i.attribute_name.verbos_name,
-                                initial=i.attribute_value_manual,
-                                required=i.attribute_name.required,
-                                widget=forms.NumberInput(attrs={'class': i.attribute_name, 'min':"0",'name':i.attribute_name})
+                    self.fields[i.name] = forms.IntegerField(
+                                label=i.verbos_name,
+                                initial=initial,
+                                required=i.required,
+                                widget=forms.NumberInput(attrs={'class': i.name, 'min':"0",'name':i.name})
                                 )
-                    print(i.attribute_value_manual)
+                    # print(i.attribute_value_manual)
 
 
 
 class AdverForm(forms.ModelForm):
 
 
-    # description = forms.CharField(widget=TinyMCE(attrs={'cols': 20, 'rows': 20}))
 
+
+    # def __init__(self, *args, **kwargs):
+    #
+    #     user = kwargs.pop('user')
+    #     super(AdverForm, self).__init__(*args, **kwargs)
+    #     print(user.userprofiletable_set.get().adress_state)
+    #
+    #     state = user.userprofiletable_set.get().adress_state
+    #     city = user.userprofiletable_set.get().adress_city
+    #
+    #
+    #     if state and city:
+    #         self.fields['state'].initial = state
+    #         self.fields['city'].initial = city
 
 
     class Meta:
      model = Goods
-     fields = ('category','subcategory','name','description','price')
+     fields = ('category','subcategory','types','name','description','price',
+
+               'state','city'
+               )
      # exclude = ['user','is_active','creation_date','is_sell']
 
 
@@ -99,43 +126,50 @@ class AdverForm(forms.ModelForm):
 
 class AddAttrFilterForm(forms.Form):
 
+
+    q  = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Поиск'}))
+
     def __init__(self, *args, **kwargs):
 
         subcategory = kwargs.pop('sub_category')
 
+
+
         super(AddAttrFilterForm, self).__init__(*args, **kwargs)
 
-        self.fields['q']  = forms.CharField(label='Поиск',required=False)
+
 
 
         list = subcategory.attributes.filter(filtering=True).order_by('ordering')
 
         # print(list)
         for i in list:
-            if i.type == 'choice':
+            if i.attr_type == 'choice':
 
                 self.fields[i] = forms.ModelChoiceField(
                             label=i.verbos_name,
 
                             queryset=AttributeValue.objects.filter(attribute=i),
                             widget=forms.Select(attrs={'class': i}),
+                            empty_label= i.verbos_name,
+
                             required=False
 
                             )
-            elif i.type == 'text':
+            elif i.attr_type == 'text':
 
 
                 self.fields[i] = forms.CharField(
                             label=i.verbos_name,
                             required=False,
-                            widget=forms.TextInput(attrs={'class': i})
+                            widget=forms.TextInput(attrs={'class': i,'placeholder':i.verbos_name})
                             )
 
             else:
                 self.fields[i] = forms.IntegerField(
                             label=i.verbos_name,
                             required=False,
-                            widget=forms.NumberInput(attrs={'class': i, 'min':"0"})
+                            widget=forms.NumberInput(attrs={'class': i, 'min':"0", 'placeholder':i.verbos_name})
                             )
 
 
@@ -148,21 +182,20 @@ class AddAttrForm(forms.Form):
     def __init__(self, *args, **kwargs):
 
         subcategory = kwargs.pop('sub_category')
-        creation_flag = kwargs.pop('it_creation')
+        type = kwargs.pop('type_id')
+        # creation_flag = kwargs.pop('it_creation')
 
 
 
         super(AddAttrForm, self).__init__(*args, **kwargs)
-
-        if  creation_flag!='yes':
-             self.fields['q']  = forms.CharField(label='Поиск',required=False)
-
-
-        list = subcategory.attributes.all().order_by('ordering')
+        if type:
+            list = type.attributes.all().order_by('ordering')
+        else:
+            list = subcategory.attributes.all().order_by('ordering')
 
         # print(list)
         for i in list:
-            if i.type == 'choice':
+            if i.attr_type == 'choice':
 
                 self.fields[i] = forms.ModelChoiceField(
                             label=i.verbos_name,
@@ -172,7 +205,7 @@ class AddAttrForm(forms.Form):
                             required=i.required
 
                             )
-            elif i.type == 'text':
+            elif i.attr_type == 'text':
 
 
                 self.fields[i] = forms.CharField(

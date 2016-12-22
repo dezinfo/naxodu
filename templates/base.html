@@ -12,26 +12,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-   {% block social %} {% endblock %}
+
     <title>
     На Ходу - {% block title %} {% endblock%}
     </title>
 
+    {% block social %}
 
-    {% block extra_css %}
-        <!-- TODO: Delete this if Smart-Selects solve this problem -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-{##}
-        <script src="{% static 'smart-selects/admin/js/chainedfk.js' %}"></script>
+     {% endblock %}
 
-    {% endblock %}
+
+
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap.min.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/test.css" %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'slick/slick.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'slick/slick-theme.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'blueimp-gallery/css/blueimp-gallery.min.css' %}"/>
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
 
@@ -140,7 +140,7 @@
                 <a href=" {{  request.user.userprofiletable_set.get.get_absolute_url }}" class="padded-link">Профиль({{ request.user.username }})</a>
             </li>
             <li>
-                <a href="{% url 'pruduct_list'  request.user.username   %}" class="padded-link" rel="nofollow">Мой магазин</a>
+                <a href="{% url 'pruduct_list'  %}" class="padded-link" rel="nofollow">Мой магазин</a>
             </li>
             <li>
                 <a href="#" class="padded-link">Сообщения</a>
@@ -197,12 +197,11 @@
 <div class="navbar navbar-default">
   <div class="navbar-ul">
     <ul class="nav" id="nav-menu">
-{#      <li><a href="{% url 'reference' %}">Рекомендую</a></li>#}
       <li><a href="{% url 'callboard' %}">Витрина</a></li>
       <li><a href="/auction/">Аукционы</a></li>
-      <li><a href="/sale/">Распродажа</a></li>
+{#      <li><a href="/sale/">Распродажа</a></li>#}
       <li><a href="{% url 'reviews' %}">Обзоры</a></li>
-	  <li><a href="{% url 'forums' %}">Сообщества</a></li>
+	  <li><a href="{% url 'forums' %}">Сообщество</a></li>
       <li><a href="/rate/">Рейтинг продавцов</a></li>
     </ul>
   </div>

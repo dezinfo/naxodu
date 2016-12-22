@@ -5,7 +5,7 @@ from django.test import TestCase
 from userprofile.models import Cities,States
 import os
 
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sxodu.settings")
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "naxodu.settings")
 
 workpath = os.path.dirname(os.path.abspath(__file__))
 

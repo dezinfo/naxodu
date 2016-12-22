@@ -23,11 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'x_93%9)x34)qw_zc_11ml$%#h8oh$o)k4u7-(z()+*e_wu-4-z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
+#DEBUG = False
 DEBUG = True
-
+UNDER_CUNSTRUCTION = False
 # ALLOWED_HOSTS = ['127.0.0.1']
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 
@@ -45,9 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'sorl.thumbnail',
     'smart_selects',
+
     'auction',
     'callboard',
-    'sxodu',
+    'naxodu',
 
     'ckeditor',
     'ckeditor_uploader',
@@ -60,11 +61,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.odnoklassniki',
+
     'userprofile',
     'threadedcomments',
     'django_comments',
     'community',
-
     'multiupload',
     'pytils',
     'marketplace',
@@ -106,6 +107,7 @@ USE_TZ=True
 
 SITE_ID = 1
 
+
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -120,7 +122,7 @@ MIDDLEWARE_CLASSES = [
 
 ]
 
-ROOT_URLCONF = 'sxodu.urls'
+ROOT_URLCONF = 'naxodu.urls'
 
 # TEMPLATES[0]['OPTIONS']['context_processors'].insert(0, 'django.core.context_processors.request')
 
@@ -158,7 +160,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-WSGI_APPLICATION = 'sxodu.wsgi.application'
+WSGI_APPLICATION = 'naxodu.wsgi.application'
 
 
 # Database
@@ -279,6 +281,7 @@ LOGIN_URL = '/accounts/login/'
 # AllAuth Configuration #
 #########################
 ACCOUNT_EMAIL_REQUIRED = True
+SITE_NAME = 'naxodu.com'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
@@ -318,3 +321,6 @@ USERS_ONLINE__TIME_OFFLINE = 60*10 # 10 minutes
 
 USERS_ONLINE__CACHE_PREFIX_USER = 'online_user'
 USERS_ONLINE__CACHE_USERS = 'online_users'
+#
+# USE_DJANGO_JQUERY = False
+# JQUERY_URL = False

@@ -3,19 +3,21 @@
 
 {% block content %}
 
+
+
+
 <form action="{% url 'editadvert' object.pk %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 {{ EditAdvertForm.media }}
-{% for rec in EditAdvertForm %}
 
-    {% bootstrap_field rec %}
-
-
-    {% if rec.name == 'name' %}
+<div class="form-group">
+   <div style="line-height: 50px"> <label class="control-label">Рубрика</label></div>  <img src="{{ object.category.image.url }}">
 
 
+    <span class="color-3 fbold"> {{ object.category.name }} »  {{ object.subcategory.name }}</span> </div>
+{% bootstrap_field EditAdvertForm.name %}
 
-{#    {% for foo in EditAttrForm %}#}
+
 
     {% for fields in EditAttrForm %}
 
@@ -26,10 +28,37 @@
 
 
     {% endfor %}
-{#    {% endfor %}#}
-{% endif %}
 
-{% endfor %}
+{% bootstrap_field EditAdvertForm.description %}
+
+{% bootstrap_field EditAdvertForm.price %}
+
+
+
+{#{% for rec in EditAdvertForm %}#}
+{##}
+{#    {% bootstrap_field rec %}#}
+{##}
+{##}
+{#    {% if rec.name == 'name' %}#}
+{##}
+{##}
+{##}
+{#    {% for foo in EditAttrForm %}#}
+{##}
+{#    {% for fields in EditAttrForm %}#}
+{##}
+{##}
+{##}
+{#            {% bootstrap_field fields %}#}
+{##}
+{##}
+{##}
+{#    {% endfor %}#}
+{#    {% endfor %}#}
+{#{% endif %}#}
+{##}
+{#{% endfor %}#}
     {% buttons %}
     <button type="submit" class="btn btn-primary">
             {% bootstrap_icon "star" %} Сохранить </button>

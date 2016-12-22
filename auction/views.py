@@ -102,7 +102,7 @@ class FilterMixin(object):
 class AuctionListView(FilterMixin,ListView):
     model = Auction
     queryset = Auction.objects.filter(end_date__gte = timezone.now()).select_related('product').order_by('-update_date')
-    filter_class = AuctionFilter
+    # filter_class = AuctionFilter
 
     def get_context_data(self,*args, **kwargs):
 
