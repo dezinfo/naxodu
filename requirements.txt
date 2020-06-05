@@ -3,7 +3,7 @@ bs4==0.0.1
 certifi==2016.9.26
 DateTime==4.1.1
 defusedxml==0.4.1
-Django==1.10.4
+Django==1.11.29
 django-addthis==3.0.0
 django-admin-honeypot==1.0.0
 django-allauth==0.28.0
